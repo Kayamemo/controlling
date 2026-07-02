@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Controlling – HS Worms</title>
+<style>
+:root{--bg:#0d1117;--bg2:#161b27;--bg3:#1e2538;--card:#1a2035;--border:#2a3354;--accent:#5b9cf6;--accent2:#a78bfa;--green:#3dd68c;--red:#f87171;--yellow:#fbbf24;--orange:#fb923c;--text:#e2e8f0;--text2:#94a3b8;--text3:#475569;--r:14px}
+[data-theme=light]{--bg:#f1f5f9;--bg2:#e2e8f0;--bg3:#cbd5e1;--card:#fff;--border:#cbd5e1;--accent:#2563eb;--accent2:#7c3aed;--green:#059669;--red:#dc2626;--yellow:#d97706;--orange:#ea580c;--text:#0f172a;--text2:#475569;--text3:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+#hdr{background:var(--bg2);border-bottom:1px solid var(--border);padding:11px 15px 9px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+#hdr h1{font-size:15px;font-weight:700;letter-spacing:-.3px}
+#hdr .sub{font-size:10px;color:var(--text2);margin-top:1px}
+.tbtn{background:var(--bg3);border:none;border-radius:20px;padding:5px 10px;font-size:12px;color:var(--text2);cursor:pointer}
+#nav{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+#nav::-webkit-scrollbar{display:none}
+.nt{flex-shrink:0;padding:9px 12px;font-size:12px;font-weight:600;color:var(--text2);border:none;background:none;cursor:pointer;border-bottom:2.5px solid transparent;transition:all .2s;white-space:nowrap}
+.nt.active{color:var(--accent);border-bottom-color:var(--accent)}
+#main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.view{display:none;padding:12px}
+.view.active{display:block}
+.mhd{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:12px 13px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r)}
+.mhd-icon{font-size:24px;flex-shrink:0}
+.mhd h2{font-size:16px;font-weight:700}
+.mhd p{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4}
+.sdiv{display:flex;align-items:center;gap:8px;margin:16px 0 9px}
+.sline{flex:1;height:1px;background:var(--border)}
+.stxt{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+.card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:9px;overflow:hidden;transition:border-color .2s}
+.card.open{border-color:var(--accent)}
+.ch{padding:12px 13px;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;user-select:none}
+.chl{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+.ctags{display:flex;gap:4px;flex-wrap:wrap}
+.tag{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;flex-shrink:0}
+.td{background:rgba(91,156,246,.15);color:var(--accent)}
+.tf{background:rgba(61,214,140,.15);color:var(--green)}
+.ti{background:rgba(251,191,36,.15);color:var(--yellow)}
+.tz{background:rgba(167,139,250,.15);color:var(--accent2)}
+.tk{background:rgba(248,113,113,.15);color:var(--red)}
+.tK{background:rgba(61,214,140,.2);color:var(--green);border:1px solid rgba(61,214,140,.3)}
+.ch h3{font-size:13px;font-weight:600;color:var(--text);line-height:1.35}
+.prev{font-size:11px;color:var(--text2);line-height:1.3}
+.chv{font-size:11px;color:var(--text3);flex-shrink:0;margin-top:2px;transition:transform .2s}
+.chv.o{transform:rotate(180deg)}
+.cb{display:none}
+.cb.open{display:block}
+.cs{padding:11px 13px;border-top:1px solid var(--border)}
+.cs-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.kl{list-style:none;display:flex;flex-direction:column;gap:5px}
+.kl li{font-size:13px;color:var(--text2);line-height:1.55;padding-left:14px;position:relative}
+.kl li::before{content:'•';position:absolute;left:0;color:var(--accent);font-weight:700}
+.kl li b{color:var(--text);font-weight:600}
+.kl li em{color:var(--text3);font-style:normal;font-size:12px}
+.fm{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;font-weight:600;color:var(--accent);font-family:'SF Mono',monospace;line-height:1.8;text-align:center}
+.ex{background:var(--bg3);border-radius:10px;padding:10px 12px}
+.ex-t{font-size:11px;font-weight:700;color:var(--orange);margin-bottom:5px}
+.ex p,.ex li{font-size:13px;color:var(--text);line-height:1.5}
+.ex .st{font-size:12px;color:var(--text2);line-height:1.6;padding:2px 0}
+.tip{background:rgba(251,191,36,.08);border-left:3px solid var(--yellow);border-radius:0 9px 9px 0;padding:9px 12px;font-size:13px;color:var(--text);line-height:1.5}
+.warn{background:rgba(248,113,113,.08);border-left:3px solid var(--red);border-radius:0 9px 9px 0;padding:9px 12px;font-size:13px;color:var(--text);line-height:1.5}
+.conn{background:rgba(167,139,250,.08);border-left:3px solid var(--accent2);border-radius:0 9px 9px 0;padding:9px 12px;font-size:13px;color:var(--text);line-height:1.5}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{background:var(--bg3);color:var(--text2);font-weight:600;padding:5px 7px;text-align:left;border:1px solid var(--border)}
+td{padding:4px 7px;border:1px solid var(--border);color:var(--text2);line-height:1.4}
+td.hi{color:var(--accent);font-weight:600}
+td.ok{color:var(--green);font-weight:600}
+td.wr{color:var(--red)}
+.flow{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.fb{padding:4px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.fa{background:rgba(91,156,246,.15);color:var(--accent);border:1px solid rgba(91,156,246,.2)}
+.fg{background:rgba(61,214,140,.15);color:var(--green);border:1px solid rgba(61,214,140,.2)}
+.fy{background:rgba(251,191,36,.15);color:var(--yellow);border:1px solid rgba(251,191,36,.2)}
+.fp{background:rgba(167,139,250,.15);color:var(--accent2);border:1px solid rgba(167,139,250,.2)}
+.arr{color:var(--text3);font-size:13px}
+.zc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:9px}
+.zc-t{font-size:14px;font-weight:700;margin-bottom:9px}
+.zc p{font-size:13px;color:var(--text2);line-height:1.65}
+.zc p b{color:var(--text)}
+.qmode{display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap}
+.qmb{flex:1;min-width:50px;padding:7px 3px;border-radius:9px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;text-align:center;transition:all .2s}
+.qmb.active{background:rgba(91,156,246,.15);border-color:var(--accent);color:var(--accent)}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.qprog{display:flex;gap:3px;margin-bottom:12px}
+.qdot{flex:1;height:3px;border-radius:3px;background:var(--bg3)}
+.qdot.done{background:var(--green)}
+.qdot.cur{background:var(--accent2)}
+.qmod{font-size:11px;color:var(--text3);margin-bottom:4px}
+.qq{font-size:14px;font-weight:600;color:var(--text);line-height:1.5;margin-bottom:12px}
+.qopts{display:flex;flex-direction:column;gap:7px}
+.qob{padding:11px 13px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;cursor:pointer;text-align:left;transition:all .15s;line-height:1.4;font-family:inherit;width:100%}
+.qob.correct{background:rgba(61,214,140,.12);border-color:var(--green);color:var(--green)}
+.qob.wrong{background:rgba(248,113,113,.12);border-color:var(--red);color:var(--red)}
+.qob.show-c{background:rgba(61,214,140,.06);border-color:rgba(61,214,140,.4)}
+.qfb{margin-top:11px;padding:11px;border-radius:9px;font-size:13px;line-height:1.6;display:none}
+.qfb.show{display:block}
+.qfb.ok{background:rgba(61,214,140,.1);color:var(--green)}
+.qfb.nok{background:rgba(248,113,113,.1);color:var(--red)}
+.qnext{display:none;width:100%;margin-top:11px;padding:12px;border-radius:9px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.qnext.show{display:block}
+.qres{text-align:center;padding:26px 14px}
+.qres .big{font-size:50px;font-weight:700;color:var(--accent)}
+.qres .sub{font-size:13px;color:var(--text2);margin-top:4px}
+.qres .msg{font-size:14px;color:var(--text);margin-top:10px;font-weight:500}
+.qres .restart{margin-top:18px;padding:12px 30px;border-radius:9px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.srow{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--border)}
+.srow:last-child{border-bottom:none}
+.sn{font-size:12px;flex:1;color:var(--text2)}
+.sbw{width:65px;height:4px;background:var(--bg3);border-radius:3px}
+.sbar{height:100%;border-radius:3px;background:var(--accent)}
+.sp{font-size:11px;color:var(--text3);min-width:30px;text-align:right}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="hdr">
+  <div><h1>Controlling WiSe 25/26</h1><div class="sub">HS Worms · Oliver Hartwich</div></div>
+  <button class="tbtn" onclick="toggleTheme()">☀️</button>
+</div>
+<div id="nav">
+  <button class="nt active" onclick="showTab('allg')">📊 Allgemein</button>
+  <button class="nt" onclick="showTab('vtrieb')">📈 Vertrieb</button>
+  <button class="nt" onclick="showTab('prod')">🏭 Produktion</button>
+  <button class="nt" onclick="showTab('risiko')">⚠️ Risiko</button>
+  <button class="nt" onclick="showTab('digital')">🤖 Digital</button>
+  <button class="nt" onclick="showTab('zshg')">🔗 Zusammenhänge</button>
+  <button class="nt" onclick="showTab('uebung')">📝 Übungen</button>
+  <button class="nt" onclick="showTab('quiz')">🎯 Quiz</button>
+</div>
+<div id="main">
+<div class="view active" id="view-allg">
+<div class="mhd"><div class="mhd-icon">📊</div><div><h2>Allgemeines Controlling</h2><p>Definition · Aufgaben · Zeithorizonte · SWOT · Deckungsbeitragsrechnung</p></div></div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">1.1 Definition & Einordnung</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span><span class="tag tK">Klausur</span></div>
+      <h3>Was ist Controlling? (Horvath)</h3>
+      <div class="prev">Planung · Kontrolle · Informationsversorgung koordinieren</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Definition</div><p style="font-size:13px;color:var(--text2);line-height:1.6;font-style:italic">„Controlling ist – funktional gesehen – dasjenige Subsystem der Führung, das Planung und Kontrolle sowie Informationsversorgung systembildend und systemkoppelnd ergebniszielorientiert koordiniert und so die Adaption und Koordination des Gesamtsystems unterstützt." — Horváth</p></div><div class="cs"><div class="cs-lbl"><span>✅</span> Schlüsselbegriffe</div><ul class="kl"><li><b>Systembildend</b> = Teilsysteme neu aufbauen (z.B. Berichtswesen einrichten)</li><li><b>Systemkoppelnd</b> = laufende Abstimmung bestehender Teilsysteme (z.B. Infofluss aus RW)</li><li><b>Ergebniszielorientiert</b> = Fokus auf wirtschaftliches Ergebnis</li><li><b>Subsystem der Führung</b> = Unterstützungsfunktion, kein eigenständiges Ziel</li></ul></div><div class="cs"><div class="cs-lbl"><span>💡</span> Merkhilfe</div><div class="tip">🧭 <b>Controller = Navigator</b> | <b>Manager = Pilot</b><br>Manager entscheidet und trägt Ergebnisverantwortung. Controller bereitet Entscheidungen vor und sorgt für Ergebnistransparenz.</div></div><div class="cs"><div class="cs-lbl"><span>📋</span> Praxisdefinition (klausurrelevant)</div><div class="ex"><p>„Das Controlling nimmt zur Steuerung des Unternehmens <b>Planungs-, Koordinations- und Kontrollaufgaben</b> wahr, um die Unternehmensführung mit notwendigen Instrumenten und Informationen zu versorgen und den kurz- und langfristigen Unternehmenserfolg zu gewährleisten."</p></div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span></div>
+      <h3>Abgrenzung: Controlling vs. RW vs. Revision vs. Treasury</h3>
+      <div class="prev">Navigator · Buchführer · Polizei · Schatzmeister</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📊</span> Vergleich der 4 Bereiche</div><div class="tw"><table><tr><th>Bereich</th><th>Aufgabe</th><th>Orientierung</th><th>Rolle</th></tr><tr><td class="hi">Controlling</td><td>Planung, Steuerung, Kontrolle, Info</td><td>Unternehmensziele</td><td class="hi">Navigator</td></tr><tr><td>Rechnungswesen</td><td>Vergangenheit korrekt darstellen</td><td>HGB / IFRS (Gesetz)</td><td>Buchführer</td></tr><tr><td>Interne Revision</td><td>Buchführung & Prozesse prüfen</td><td>Recht & Normen</td><td>Unternehmenspolizei</td></tr><tr><td>Treasury</td><td>Liquidität, Cash, Kredit sichern</td><td>Liquiditätsziele</td><td>Schatzmeister</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>⚠️</span> Wichtiger Unterschied</div><div class="warn">Controlling ist <b>zukunftsorientiert</b> (an Zielen ausgerichtet). Rechnungswesen ist <b>vergangenheitsorientiert</b> (gesetzlich vorgeschrieben). Das RW liefert die Datenbasis – Controlling veredelt sie zu Entscheidungsinformationen.</div></div><div class="cs"><div class="cs-lbl"><span>🔗</span> Zusammenhang</div><div class="conn">Das Rechnungswesen ist die Datenbasis für das Controlling. Controlling ist systemkoppelnd zum RW.</div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span></div>
+      <h3>Historische Entwicklung des Controllings</h3>
+      <div class="prev">Vom Kontrolleur zum Sparringspartner</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>✅</span> Meilensteine</div><ul class="kl"><li>15. Jhd.: „Controllour" am englischen Königshof – Geldflüsse aufzeichnen</li><li>1778 USA: „Comptroller" – Staatsbudget und Ausgaben im Gleichgewicht halten</li><li><b>1880</b>: Erste Unternehmens-Controllerstelle (Atchison, Topeka & Santa Fe Railway)</li><li>1890er: General Electric – erstes bekanntes Unternehmen mit Controller-Funktion</li><li>Nach WW2: Verbreitung nach Europa</li><li>Ab 1980er: Ausbreitung auf Dienstleistungssektor</li><li>Heute: Dezentrale Einheit – „Mitgestalter" in nahezu allen Bereichen</li></ul></div><div class="cs"><div class="cs-lbl"><span>📈</span> 3 Entwicklungsphasen</div><div class="flow"><div class="fb fa">Rechnungswesenorientiert<br><em style="font-size:10px">Kontrolleur</em></div><span class="arr">→</span><div class="fb fg">Informationsorientiert<br><em style="font-size:10px">Datensammler</em></div><span class="arr">→</span><div class="fb fy">Managementorientiert<br><em style="font-size:10px">Sparringspartner</em></div></div></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">1.2 Die 6 Hauptaufgaben</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span><span class="tag tK">Klausur</span></div>
+      <h3>Controlling-Zyklus & 6 Hauptaufgaben</h3>
+      <div class="prev">Planung → Kontrolle → Steuerung → Planung (Kreislauf)</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>💡</span> Der Controlling-Zyklus</div><div class="flow"><div class="fb fa">Planung<br><em>Ziele setzen</em></div><span class="arr">→</span><div class="fb fg">Kontrolle<br><em>Soll-Ist</em></div><span class="arr">→</span><div class="fb fy">Steuerung<br><em>Massnahmen</em></div><span class="arr">→</span><div class="fb fp">neue Planung</div></div><div class="tip">Der Zyklus ist ein <b>Kreislauf</b>! Gilt für ALLE Controlling-Bereiche: Allgemein, Vertrieb, Produktion, Risiko, Digital.</div></div><div class="cs"><div class="cs-lbl"><span>✅</span> Die 6 Hauptaufgaben</div><ul class="kl"><li><b>1. Planung:</b> Antizipation zukünftiger Erfolgsgrößen, Budget, Zielsystem – Voraussetzung für Kontrolle</li><li><b>2. Kontrolle:</b> Soll-Ist-Vergleich, Abweichungsanalyse (ex post + ex ante), Frühwarnsystem</li><li><b>3. Steuerung:</b> Handlungsempfehlungen geben, Szenarien entwickeln, Controller als Navigator</li><li><b>4. Information:</b> Daten aufbereiten, MIS aufbauen, KPI-Reporting, Data-Driven-Decisions</li><li><b>5. Koordination:</b> systembildend (aufbauen) + systemkoppelnd (abstimmen)</li><li><b>6. Rationalitätssicherung:</b> Korrektiv der Führung – verschuldetes und unverschuldetes Fehlverhalten korrigieren</li></ul></div><div class="cs"><div class="cs-lbl"><span>⚠️</span> Ex post vs. Ex ante</div><div class="tw"><table><tr><th>Art</th><th>Zeitpunkt</th><th>Beispiel</th></tr><tr><td>Ex post</td><td>Nachträglich (Vergangenheit)</td><td>Jahresabschluss-Analyse</td></tr><tr><td class="ok">Ex ante</td><td>Im Voraus (Zukunft)</td><td class="ok">Forecast, Risikomodelle</td></tr></table></div></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">1.3 Operativ vs. Strategisch</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span><span class="tag tK">Klausur</span></div>
+      <h3>Operatives vs. Strategisches Controlling</h3>
+      <div class="prev">1–3 J. Effizienz vs. 5–10 J. Effektivität</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📊</span> Vergleichstabelle</div><div class="tw"><table><tr><th>Merkmal</th><th>Operativ</th><th>Strategisch</th></tr><tr><td>Zeitraum</td><td>1–3 Jahre</td><td>5–10 Jahre</td></tr><tr><td>Ziel</td><td>Wirtschaftlichkeit</td><td>Langfr. Existenz</td></tr><tr><td>Motto</td><td class="hi">Effizienz – Dinge richtig tun</td><td class="ok">Effektivität – Richtige Dinge tun</td></tr><tr><td>Orientierung</td><td>Intern</td><td>Extern</td></tr><tr><td>Daten</td><td>Quantitativ / Monetär</td><td>Qualitativ</td></tr><tr><td>Sicherheit</td><td>Hoch</td><td>Niedrig / Unsicher</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>📋</span> Instrumente im Überblick</div><div class="tw"><table><tr><th>Operativ</th><th>Strategisch</th></tr><tr><td>Break-Even-Analyse</td><td>SWOT-Analyse</td></tr><tr><td>Soll-Ist-Vergleich</td><td>BCG-Portfolioanalyse</td></tr><tr><td>ABC-Analyse</td><td>Porters Five Forces</td></tr><tr><td>Deckungsbeitragsrechnung</td><td>Balanced Scorecard</td></tr><tr><td>Investitionsrechnung</td><td>Produktlebenszyklus, CLV</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>💡</span> Merkhilfe</div><div class="tip">Mission → operative Geschäfte → operatives Controlling<br>Vision → strategische Richtung → strategisches Controlling</div></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">SWOT-Analyse (strategisches Instrument)</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag ti">Instrument</span><span class="tag tK">Klausur</span></div>
+      <h3>SWOT-Analyse – Aufbau, Strategien, Vor-/Nachteile</h3>
+      <div class="prev">S+O=Ausbauen · S+T=Absichern · W+O=Aufholen · W+T=Vermeiden</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Was ist SWOT?</div><ul class="kl"><li><b>S</b>trengths + <b>W</b>eaknesses = <b>interne</b> Unternehmensanalyse (beeinflussbar)</li><li><b>O</b>pportunities + <b>T</b>hreats = <b>externe</b> Umweltanalyse (nicht direkt beeinflussbar)</li><li>Kombination beider Dimensionen ergibt 4 Normstrategien</li></ul></div><div class="cs"><div class="cs-lbl"><span>📊</span> Die 4 Strategien der SWOT-Matrix</div><div class="tw"><table><tr><th></th><th>Stärken (S)</th><th>Schwächen (W)</th></tr><tr><td>Chancen (O)</td><td class="ok">S+O: Ausbauen – Chancen durch Stärken nutzen</td><td>W+O: Aufholen – Chancen zum Schwächen ausgleichen</td></tr><tr><td>Risiken (T)</td><td>S+T: Absichern – Stärken gegen Risiken einsetzen</td><td class="wr">W+T: Vermeiden – defensive Haltung (schlechteste Kombi!)</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>⚠️</span> Vor- und Nachteile</div><div class="tw"><table><tr><th>Vorteile</th><th>Nachteile</th></tr><tr><td>Flexibel, intern + extern kombiniert</td><td>Qualitativ und subjektiv</td></tr><tr><td>Weit verbreitet, gut kommunizierbar</td><td>Keine klaren nächsten Schritte</td></tr><tr><td>Universell einsetzbar</td><td>Gefahr nachträglicher Rationalisierung</td></tr><tr><td>Vergleichbar über Zeit</td><td>Aufwändig bei Faktorenänderung</td></tr></table></div></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">Deckungsbeitragsrechnung</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Formel</span><span class="tag tK">Klausur</span></div>
+      <h3>Einstufige DB-Rechnung</h3>
+      <div class="prev">DB = Umsatz − variable Kosten | Ergebnis = DB − Fixkosten</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📐</span> Formel</div><div class="fm">DB = Umsatzerlös − variable Kosten<br>Ergebnis = DB gesamt − Fixkosten</div></div><div class="cs"><div class="cs-lbl"><span>📖</span> Grundprinzip</div><ul class="kl"><li>Kosten nach <b>Verursachungsprinzip</b> zuordnen</li><li>DB zeigt wie viel ein Produkt zur <b>Fixkostendeckung</b> beiträgt</li><li>Nicht verwechseln mit GuV (hier: Periodenbetrachtung)</li></ul></div><div class="cs"><div class="cs-lbl"><span>📊</span> Beispiel</div><div class="tw"><table><tr><th></th><th>Produkt A</th><th>Produkt B</th><th>Gesamt</th></tr><tr><td>Umsatzerlöse</td><td>250.000€</td><td>170.000€</td><td>420.000€</td></tr><tr><td>variable Kosten</td><td>120.000€</td><td>130.000€</td><td>250.000€</td></tr><tr><td class="hi">DB</td><td class="hi">130.000€</td><td class="hi">40.000€</td><td class="hi">170.000€</td></tr><tr><td>Fixkosten</td><td>–</td><td>–</td><td>100.000€</td></tr><tr><td class="ok">Ergebnis</td><td class="ok">–</td><td class="ok">–</td><td class="ok">70.000€</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>💡</span> Interpretation</div><div class="tip">Produkt A trägt 130.000€, B nur 40.000€ zur Fixkostendeckung bei. Produkt B hinterfragen – aber Interdependenzen prüfen!</div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Formel</span><span class="tag tK">Klausur</span></div>
+      <h3>Mehrstufige DB-Rechnung</h3>
+      <div class="prev">DB I → DB II → DB III → EBIT</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📐</span> Stufenformel</div><div class="fm">Umsatz − variable Kosten = <b>DB I</b><br>DB I − Erzeugnisfixkosten = <b>DB II</b><br>DB II − Gruppenfixkosten = <b>DB III</b><br>DB III − Unternehmensfixkosten = <b>EBIT</b></div></div><div class="cs"><div class="cs-lbl"><span>📖</span> Warum mehrstufig?</div><ul class="kl"><li>Granularere Verteilung der Fixkosten auf Kostenträger (nach Verursachungsprinzip)</li><li>Detailliertere Analyse – welche Produkt-/Produktgruppe trägt wie viel bei?</li><li>In der Praxis: SAP liefert mehrstufige DB-Daten</li></ul></div><div class="cs"><div class="cs-lbl"><span>📊</span> Klausurbeispiel – Gartenmöbel (A,B in Halle1 | C,D in Halle2)</div><div class="tw"><table><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr><tr><td>Umsatz</td><td>7000</td><td>6000</td><td>5000</td><td>6000</td></tr><tr><td>var. Kosten</td><td>5000</td><td>4000</td><td>1600</td><td>1400</td></tr><tr><td class="hi">DB I</td><td class="hi">2000</td><td class="hi">2000</td><td class="hi">3400</td><td class="hi">4600</td></tr><tr><td>Erz.Fixkosten</td><td>600</td><td>400</td><td>1200</td><td>1800</td></tr><tr><td class="hi">DB II</td><td class="hi">1400</td><td class="hi">1600</td><td class="hi">2200</td><td class="hi">2800</td></tr><tr><td>Gruppen-FK</td><td>1500 (Halle1)</td><td>1500 (Halle1)</td><td>4500 (Halle2)</td><td>4500 (Halle2)</td></tr><tr><td class="hi">DB III</td><td class="hi">1500 (Halle1)</td><td class="hi">1500 (Halle1)</td><td class="hi">500 (Halle2)</td><td class="hi">500 (Halle2)</td></tr><tr><td>UFix</td><td>300</td><td>300</td><td>300</td><td>300</td></tr><tr><td class="ok">EBIT</td><td class="ok">1700</td><td class="ok">1700</td><td class="ok">1700</td><td class="ok">1700</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>⚠️</span> Sensitivitätsanalyse</div><div class="warn">Wenn var. Kosten D auf 4.000€ steigen: DB II(D)=200€ → Halle2-GFK=4.500€ nicht gedeckt → EBIT = <b>-900€!</b> Positiver DB II allein reicht nicht – immer alle Stufen prüfen.</div></div><div class="cs"><div class="cs-lbl"><span>💡</span> Entscheidungsregeln</div><div class="tip">Negatives DB I → sofort eliminieren (Interdependenzen prüfen!)<br>Neg. DB II, pos. DB I → Erzeugnisfixkosten zu hoch<br>Neg. DB III, pos. DB II → Gruppenfixkosten decken mehrere Produkte</div></div></div>
+</div>
+</div>
+<div class="view" id="view-vtrieb">
+<div class="mhd"><div class="mhd-icon">📈</div><div><h2>Vertriebscontrolling</h2><p>Definition · KPIs · Kundenlebenszyklus · ABC · BCG · CLV · WACC</p></div></div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">2.1 Grundlagen</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span></div>
+      <h3>Was ist Vertriebscontrolling?</h3>
+      <div class="prev">Planung, Steuerung, Kontrolle aller vertrieblichen Prozesse</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Definition Vertrieb (Nischlag)</div><div class="ex"><p>„Inbegriff der Maßnahmen, die ein Anbieter trifft, um seine Leistungen in den <b>Verfügungsbereich der Nachfrager</b> zu bringen." Aufgaben: organisatorisch, akquisitorisch, logistisch.</p></div></div><div class="cs"><div class="cs-lbl"><span>✅</span> Aufgaben & Bedeutung</div><ul class="kl"><li>Planung, Steuerung, Koordination und Kontrolle aller vertrieblichen Prozesse</li><li>Schnittstelle: <b>Verkauf ↔ Vertriebsführung ↔ Controlling</b></li><li>Vertriebseffizienz steigern, Prozesse berechenbarer machen</li><li>Wandel: <b>Verkäufermarkt → Käufermarkt</b> erhöht Bedeutung des Vertriebs</li></ul></div><div class="cs"><div class="cs-lbl"><span>🔗</span> Vertriebsprozess</div><div class="flow"><div class="fb fa">Zielgruppe</div><span class="arr">→</span><div class="fb fg">Akquise</div><span class="arr">→</span><div class="fb fy">Verkauf/Lieferung</div><span class="arr">→</span><div class="fb fp">Betreuung</div></div></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">2.2 Kennzahlen (KPIs)</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Formel</span><span class="tag tK">Klausur</span></div>
+      <h3>Mitarbeiter- & Unternehmensbezogene Vertriebskennzahlen</h3>
+      <div class="prev">Conversion Rate · ROI · Marge · Marktanteil</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>✅</span> Mitarbeiterbezogene KPIs</div><ul class="kl"><li><b>Kontakthäufigkeit</b> = Anzahl Kundenkontakte pro Periode</li><li><b>Kontaktintensität</b> = Nettoumsatz / Anzahl Kundenkontakte</li><li><b>Kontakterfolgsquote</b> = 100 × Terminvereinbarungen / kontaktierte Interessenten</li><li><b>Besuchseffizienz</b> = 100 × Aufträge / Kundenbesuche</li><li><b>Conversion Rate</b> = Neukunden / kontaktierte Interessenten</li><li><b>Produktivität</b> = Umsatz / Mitarbeiter</li></ul></div><div class="cs"><div class="cs-lbl"><span>✅</span> Unternehmensbezogene KPIs</div><ul class="kl"><li><b>Break-Even-Point</b> = Fixkosten / Stück-DB</li><li><b>ROI</b> = Erfolg / eingesetzte Mittel</li><li><b>Marge</b> = (Umsatz − Kosten) / Umsatz</li><li><b>Auftragsreichweite</b> = (Auftragsbestand / Umsatz letzte 12 Monate) × 360</li><li><b>ARR</b> = Abonnementumsatz / Laufzeit</li><li><b>Marketingeffizienz</b> = Marketingkosten / Umsatz</li><li><b>Marktanteil & relativer Marktanteil</b></li><li><b>Umsatzwachstum</b> auch relativ zum Marktwachstum</li></ul></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">2.3 Kundenlebenszyklus</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span><span class="tag tK">Klausur</span></div>
+      <h3>6 Phasen des Kundenlebenszyklus</h3>
+      <div class="prev">Awareness → Acquisition → Conversion → Retention → Loyality → Recovery</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Was ist der Kundenlebenszyklus?</div><p style="font-size:13px;color:var(--text2);line-height:1.5">Beschreibt die <b>gesamte langfristige Geschäftsbeziehung</b> zwischen Kunde und Unternehmen – nicht nur einzelne Transaktionen. Teil des CRM (Customer Relationship Management).</p></div><div class="cs"><div class="cs-lbl"><span>📊</span> Die 6 Phasen</div><div class="tw"><table><tr><th>Phase</th><th>Beschreibung</th><th>Ziel</th></tr><tr><td>1. Awareness</td><td>Erstkontakt, Touchpoint bedienen</td><td>Aufmerksamkeit gewinnen</td></tr><tr><td>2. Acquisition</td><td>Kundenakquise, vom Kauf überzeugen</td><td>Interesse wecken</td></tr><tr><td>3. Conversion</td><td>Interessent → Neukunde</td><td>Ersten Kauf abschliessen</td></tr><tr><td class="ok">4. Retention</td><td class="ok">Kundenbindung, Up-/Cross-Selling</td><td class="ok">Kunden halten (wichtigste Phase!)</td></tr><tr><td>5. Loyality</td><td>Weiterempfehlung, Wiederkäufer</td><td>Churn minimieren</td></tr><tr><td>6. Recovery</td><td>Kundenrückgewinnung</td><td>Verlorene Kunden zurückgewinnen</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>💡</span> Wichtigste Erkenntnis</div><div class="tip">Retention effizienter als Neuakquise! Bestehenden Kunden halten kostet weniger als neuen gewinnen. Deshalb: Churn Rate minimieren!</div></div><div class="cs"><div class="cs-lbl"><span>⚠️</span> Grenzen des Modells</div><ul class="kl"><li><b>Problem 1:</b> Linearität – zu vereinfacht für komplexe Beziehungen</li><li><b>Problem 2:</b> Fehlende Quantifizierung des Kundenwertes → Lösung: CLV</li></ul></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">2.4 Kundenstrukturanalyse</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag ti">Instrument</span><span class="tag tK">Klausur</span></div>
+      <h3>Kunden-ABC-Analyse</h3>
+      <div class="prev">80/20-Regel · 7 Schritte · A/B/C klassifizieren</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Ziel</div><ul class="kl"><li>Priorisierung von Objekten (Kunden, Material, Produkte etc.) nach Wichtigkeit</li><li>Zwei Merkmale → A/B/C-Kategorien: Wichtiges von Unwichtigem trennen</li></ul></div><div class="cs"><div class="cs-lbl"><span>📊</span> Die 3 Klassen</div><div class="tw"><table><tr><th>Klasse</th><th>Wertanteil</th><th>Kundenzahl</th><th>Massnahme</th></tr><tr><td class="hi">A-Kunden</td><td class="hi">70-80%</td><td>~20%</td><td>Priorisierung hoch</td></tr><tr><td>B-Kunden</td><td>10-20%</td><td>~30%</td><td>Selektiv bearbeiten</td></tr><tr><td class="wr">C-Kunden</td><td class="wr">5-10%</td><td class="wr">~50%</td><td>Effizienz steigern / reduzieren</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>✅</span> 7-Schritte-Vorgehen</div><ul class="kl"><li>1. Fragestellung und Merkmalsgrößen wählen</li><li>2. Individuelle Zielgröße kalkulieren</li><li>3. Sortieren (absteigend nach Wert)</li><li>4. Kumulieren (laufende Summe bilden)</li><li>5. Kumulierten Ergebnisbeitrag in % ermitteln</li><li>6. Grenzwerte festsetzen (A: bis 80%, B: bis 90%, C: Rest)</li><li>7. Grafische Darstellung & Handlungsempfehlungen ableiten</li></ul></div><div class="cs"><div class="cs-lbl"><span>💡</span> Pareto-Prinzip</div><div class="tip">80/20-Regel: ~20% der Kunden generieren ~80% des Umsatzes. Gilt auch im Einkauf (A-Teile), Produktion (A-Produkte) und überall im Controlling!</div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag ti">Instrument</span><span class="tag tK">Klausur</span></div>
+      <h3>BCG-Portfolioanalyse</h3>
+      <div class="prev">Question Mark · Star · Cash Cow · Poor Dog</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Aufbau</div><ul class="kl"><li>Von der <b>Boston Consulting Group (BCG)</b> entwickelt</li><li>Achsen: <b>Marktwachstum</b> (y) × <b>relativer Marktanteil</b> (x)</li><li><b>Relativer MA</b> = Marktanteil Produkt / Marktanteil grösster Konkurrent</li></ul></div><div class="cs"><div class="cs-lbl"><span>📊</span> Die 4 Quadranten</div><div class="tw"><table><tr><th>Quadrant</th><th>Rel. MA</th><th>Wachstum</th><th>Cashflow</th><th>Strategie</th></tr><tr><td>❓ Question Marks</td><td>Niedrig</td><td>Hoch</td><td>Negativ</td><td>Selektion</td></tr><tr><td>⭐ Stars</td><td>Hoch</td><td>Hoch</td><td>Positiv</td><td>Investieren</td></tr><tr><td>🐄 Cash Cows</td><td>Hoch</td><td>Niedrig</td><td class="hi">Hoch positiv</td><td class="hi">Abschöpfen</td></tr><tr><td>🐕 Poor Dogs</td><td>Niedrig</td><td>Niedrig</td><td>Gering</td><td class="wr">Desinvestieren</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>🔗</span> Zusammenhang mit Produktlebenszyklus</div><div class="conn">Question Mark = Einführung → Star = Wachstum → Cash Cow = Reife/Sättigung → Poor Dog = Abschwung. Beide Modelle beschreiben denselben Lebensbogen aus verschiedener Perspektive!</div></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">2.5 Kundenwertanalyse</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Formel</span><span class="tag tK">Klausur</span></div>
+      <h3>Customer Lifetime Value (CLV)</h3>
+      <div class="prev">Barwert der gesamten Kundenbeziehung – auch Zukunft!</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Was ist der CLV?</div><ul class="kl"><li>Quantifiziert Kundenwert bzgl. <b>gegenwärtiger UND zukünftiger</b> Zahlungsströme</li><li>Nicht nur vergangenheits-, sondern <b>zukunftsorientiert</b></li><li>Weiterentwicklung der Kunden-DB-Rechnung</li><li>Lohnt sich der Invest in die Kundenbeziehung?</li></ul></div><div class="cs"><div class="cs-lbl"><span>📐</span> Formel</div><div class="fm">Einfach: CLV = Σ (Et − At) / (1+i)^t<br><br>Erweitert:<br>CLV = Σ [−I₀ + (Et − At) / (1+i)^t] × R^t</div></div><div class="cs"><div class="cs-lbl"><span>📖</span> Variablen erklärt</div><div class="tw"><table><tr><th>Variable</th><th>Bedeutung</th></tr><tr><td class="hi">Et</td><td>Einzahlungen aus Kundenbeziehung (Umsatz)</td></tr><tr><td>At</td><td>Auszahlungen aus Kundenbeziehung (Kosten)</td></tr><tr><td>i</td><td>Diskontierungszinssatz (z.B. WACC)</td></tr><tr><td class="hi">I₀</td><td>Akquisitionskosten bei t=0 (einmalig!)</td></tr><tr><td class="hi">R</td><td>Retentionrate – multipliziert sich jährlich: R¹, R², R³...</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>📊</span> REWE-Beispiel (klausurrelevant!)</div><div class="ex"><div class="ex-t">Gegeben</div><p class="st">I₀=150€ Gutschein · Et=5.200€/Jahr · At=300€/Jahr · i=10% · R=90%</p><p class="st">Jahr 1: EÜ = 5.200 − 150 − 300 = 4.750€ (wegen I₀)</p><p class="st">Ab Jahr 2: EÜ = 5.200 − 300 = 4.900€</p><p class="st">Diskontierungsfaktor: 1/(1,1)^t | Retention: 0,9 · 0,81 · 0,729...</p><p class="st">Disk.EÜ Jahr1: 4.750 × 0,909 × 0,9 = 3.886€</p><p class="st">→ CLV gesamt = <b>13.842,69€</b></p></div></div><div class="cs"><div class="cs-lbl"><span>⚠️</span> Nachteile</div><div class="warn">Subjektive Schätzungen (i, R), Menschen handeln nicht linear, Markt bleibt nicht konstant. Ein-/Auszahlungen sind Prognosen → Unsicherheit bleibt!</div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Formel</span><span class="tag tK">Klausur</span></div>
+      <h3>WACC – Diskontierungszinssatz</h3>
+      <div class="prev">Gewichteter Kapitalkostensatz aus EK + FK</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📐</span> Formel</div><div class="fm">WACC = i_EK × (EK/GK) + i_FK × (FK/GK) × (1−T)<br><br>i_EK = Eigenkapitalzinssatz · i_FK = Fremdkapitalzinssatz<br>T = Steuersatz · GK = Gesamtkapital</div></div><div class="cs"><div class="cs-lbl"><span>📊</span> Beispiel</div><div class="ex"><div class="ex-t">Berechnung</div><p class="st">EK=30 Mio.€ · FK=70 Mio.€ · i_EK=10% · i_FK=4% · T=0%</p><p class="st">WACC = 10% × 0,3 + 4% × 0,7 × 1</p><p class="st">= 3% + 2,8% = <b>5,8%</b></p></div></div><div class="cs"><div class="cs-lbl"><span>🔗</span> Verwendung</div><div class="conn">WACC = Mischzinssatz aus EK- und FK-Kosten. Ursprung im CAPM. Wird als Diskontierungszinssatz i im CLV verwendet.</div></div></div>
+</div>
+</div>
+<div class="view" id="view-prod">
+<div class="mhd"><div class="mhd-icon">🏭</div><div><h2>Produktionscontrolling</h2><p>Produkt-DB · Programmplanung · Break-Even · Preiskalkulation · Elastizität · Make-or-Buy</p></div></div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">3.1 Grundlagen & 4 Kernfragen</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span></div>
+      <h3>Was ist Produktionscontrolling?</h3>
+      <div class="prev">4 Kernfragen · Operativ · Taktisch · Strategisch</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>✅</span> 4 Kernfragen des Produktionscontrollings</div><ul class="kl"><li><b>Frage 1:</b> Welche Produkte tragen zur Wirtschaftlichkeit bei? → Produkt-DB-Rechnung</li><li><b>Frage 2:</b> Mit welchem Sortiment bei Engpässen produzieren? → Programmplanung</li><li><b>Frage 3:</b> Wie wirtschaftliche Preise ermitteln? → Preiskalkulation</li><li><b>Frage 4:</b> Make or Buy? Eigenproduktion oder Fremdvergabe? → Vergleichsrechnung</li></ul></div><div class="cs"><div class="cs-lbl"><span>📊</span> 3 Ebenen</div><div class="tw"><table><tr><th>Ebene</th><th>Fokus</th><th>Beispiele</th></tr><tr><td>Operativ</td><td>Laufender Betrieb</td><td>Kennzahlensystem, Kostenkontrolle, Kapazitätsabstimmung</td></tr><tr><td>Taktisch</td><td>Mittelfristig</td><td>Sortimentsgrösse, Fertigungstiefe, Make-or-Buy</td></tr><tr><td>Strategisch</td><td>Langfristig</td><td>Standorte, Technologien, IoT, Predictive Maintenance</td></tr></table></div></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">3.2 Programmplanung (Engpässe)</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag ti">Instrument</span><span class="tag tK">Klausur</span></div>
+      <h3>Optimale Programmplanung – 7 Schritte</h3>
+      <div class="prev">Relativer DB = DB/Stück ÷ Fertigungszeit → Rangreihe</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Grundgedanke</div><ul class="kl"><li>Legt produzierendes Sortiment für eine Periode fest</li><li>Engpass = knappe Ressource (Maschine, Zeit, Material)</li><li>Geplant: Revision/Austausch | Ungeplant: Defekte/Krankheit</li><li>Ziel: Deckungsbeitrag maximieren unter Engpassbedingung</li></ul></div><div class="cs"><div class="cs-lbl"><span>✅</span> Die 7 Schritte</div><ul class="kl"><li>1. Stückdeckungsbeitrag ermitteln: DB/Stück = Preis − var. Stückkosten</li><li>2. Produkte mit <b>negativem DB eliminieren</b> (Interdependenzen beachten!)</li><li>3. Maximale Menge pro Produkt und Periode bestimmen</li><li>4. Kapazität im Engpass ermitteln (z.B. Minuten)</li><li>5. <b>Relativer DB</b> = DB/Stück ÷ Fertigungszeit/Stück</li><li>6. Rangfolge nach relativem DB (höchster = Rang 1)</li><li>7. Produkte nach Rang einplanen bis Kapazität erschöpft</li></ul></div><div class="cs"><div class="cs-lbl"><span>📊</span> Klausurbeispiel (7.000 Min. Engpass)</div><div class="tw"><table><tr><th>Produkt</th><th>DB/Stk</th><th>Zeit (Min)</th><th>Rel. DB</th><th>Rang</th><th>Minuten</th><th>Menge</th></tr><tr><td class="wr">C</td><td class="wr">-1</td><td class="wr">-</td><td class="wr">-</td><td class="wr">Eliminiert</td><td class="wr">0</td><td class="wr">0</td></tr><tr><td class="ok">D</td><td class="ok">8</td><td class="ok">2</td><td class="ok">4,00</td><td class="ok">1</td><td class="ok">1.400</td><td class="ok">700</td></tr><tr><td>A</td><td>5</td><td>3</td><td>1,67</td><td>2</td><td>3.000</td><td>1.000</td></tr><tr><td>B</td><td>5</td><td>5</td><td>1,00</td><td>3</td><td>2.600</td><td>520</td></tr></table></div><div class="ex"><div class="ex-t">Ergebnis</div><p class="st">DB = 700×8 + 1.000×5 + 520×5 = 5.600+5.000+2.600 = 13.200€</p><p class="st">EBIT = 13.200 − 10.000 FK = <b>3.200€</b></p></div></div><div class="cs"><div class="cs-lbl"><span>💡</span> WICHTIGSTE Merkhilfe</div><div class="tip">NIEMALS absoluten DB maximieren bei Engpass! Immer <b>DB pro Engpasseinheit (= relativer DB)</b> maximieren. Produkt D: 8€ in 2 Min = 4€/Min >> Produkt A: 5€ in 3 Min = 1,67€/Min.</div></div><div class="cs"><div class="cs-lbl"><span>⚠️</span> Grenzen</div><ul class="kl"><li>Gilt nur für betrachtete Periode</li><li>Linearität der Kosten vorausgesetzt (keine Rabatte)</li><li>Zeitliche Interdependenzen nicht berücksichtigt</li><li>Kein Fixkostendegressionseffekt</li></ul></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">3.3 Break-Even-Analyse</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Formel</span><span class="tag tK">Klausur</span></div>
+      <h3>Break-Even – 1 Produkt & mehrere Produkte</h3>
+      <div class="prev">Gewinnschwelle = Fixkosten / Stück-DB</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📐</span> Formel (1 Produkt)</div><div class="fm">BE-Menge = Fixkosten / (Preis − var. Stückkosten)<br>= Fixkosten / Stück-DB</div></div><div class="cs"><div class="cs-lbl"><span>📊</span> Beispiel Wormser Schänke (Flammkuchen)</div><div class="ex"><div class="ex-t">Gegeben</div><p class="st">FK=350€/Tag · Preis=10€ · var.K=3€ · DB=7€</p><p class="st">BE-Menge = 350 / 7 = <b>50 Stück/Tag</b></p><p class="st">Bei 120 Stück: Gewinn = 120×7 − 350 = <b>490€</b></p><p class="st">Mit Werbebudget W=100€: neue FK=450 → neues BE=64,3 Stück</p></div></div><div class="cs"><div class="cs-lbl"><span>📐</span> Formel (mehrere Produkte)</div><div class="fm">DB-Rate = DB/Stück / Preis<br>Gew. DB-Rate = Σ (DB-Rate × Umsatzanteil)<br>BE-Umsatz = Fixkosten / gew. DB-Rate</div></div><div class="cs"><div class="cs-lbl"><span>📊</span> Beispiel 3 Sorten</div><div class="tw"><table><tr><th>Sorte</th><th>Preis</th><th>var.K</th><th>DB</th><th>DB-Rate</th><th>Anteil</th><th>Gew.</th></tr><tr><td>Normal</td><td>10€</td><td>3€</td><td>7€</td><td>70%</td><td>50%</td><td>35%</td></tr><tr><td>Scharf</td><td>11€</td><td>4€</td><td>7€</td><td>64%</td><td>30%</td><td>19%</td></tr><tr><td>Süss</td><td>8€</td><td>3€</td><td>5€</td><td>63%</td><td>20%</td><td>13%</td></tr></table></div><div class="ex"><div class="ex-t">Ergebnis</div><p class="st">Gew. DB-Rate = 35+19+13 = <b>67%</b></p><p class="st">BE-Umsatz = 350 / 0,67 = <b>526€</b></p></div></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">3.4 Preiskalkulation</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span><span class="tag tK">Klausur</span></div>
+      <h3>3 Verfahren & Angebotskalkulation</h3>
+      <div class="prev">Kostenorientiert · Wettbewerb · Nachfrage · Vor-/Rückwärtskalkulation</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>✅</span> 3 Preisermittlungsverfahren</div><div class="tw"><table><tr><th>Verfahren</th><th>Basis</th><th>Besonderheit</th></tr><tr><td>Kostenorientiert</td><td>Kosten + Gewinnaufschlag</td><td>Kurz-/langfr. Preisuntergrenze</td></tr><tr><td>Wettbewerbsorientiert</td><td>Marktpreis (Angebot/Nachfrage)</td><td>Vollk./unvollk. Markt</td></tr><tr><td>Nachfrageorientiert</td><td>Kundenpreisvorstellung</td><td>Target Costing</td></tr></table></div><div class="fm">Kurzfr. PUG = variable Kosten decken (DB ≥ 0)<br>Langfr. PUG = alle Kosten decken (var. + fix)</div></div><div class="cs"><div class="cs-lbl"><span>📐</span> Angebotskalkulation (Vorwärtskalkulation)</div><div class="fm">Einstandspreis + Handlungskosten = Selbstkosten<br>+ Gewinn = Barverkaufspreis<br>+ Kundenskonto = Zielverkaufspreis<br>+ Kundenrabatt = Listenverkaufspreis (UVP)</div></div><div class="cs"><div class="cs-lbl"><span>📊</span> Rückwärtskalkulation Beispiel</div><div class="ex"><div class="ex-t">Gegeben</div><p class="st">Einstandspreis=2.500€ · Handlungskosten=400€ · Listenpreis=3.200€ · Rabatt=5% · Skonto=2%</p><p class="st">Selbstkosten = 2.500+400 = <b>2.900€</b></p><p class="st">Listenpreis 3.200 − 5% = Zielpreis <b>3.040€</b></p><p class="st">Zielpreis 3.040 / 1,02 = Barpreis <b>2.979€</b></p><p class="st">Gewinn = 2.979 − 2.900 = <b>79€ = 2,7% Marge</b></p></div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Formel</span><span class="tag tK">Klausur</span></div>
+      <h3>Preiselastizität der Nachfrage</h3>
+      <div class="prev">η = Reaktion der Nachfrage auf Preisveränderung</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📐</span> Formel</div><div class="fm">η = (ΔQ / ΔP) × (P_alt / Q_alt)</div></div><div class="cs"><div class="cs-lbl"><span>📊</span> Übersicht</div><div class="tw"><table><tr><th>η-Wert</th><th>Bezeichnung</th><th>Preiserhöh. → Umsatz</th><th>Beispiel</th></tr><tr><td>η = 0</td><td>Vollk. unelastisch</td><td class="ok">Steigt</td><td>Insulin, Wasser</td></tr><tr><td>0 < η < 1</td><td>Unelastisch</td><td class="ok">Steigt</td><td>Grundnahrungsmittel</td></tr><tr><td>η = 1</td><td>Proportional</td><td>Gleich</td><td>—</td></tr><tr><td>η > 1</td><td class="hi">Sehr elastisch</td><td class="wr">Sinkt!</td><td>Luxusgüter, Cola</td></tr><tr><td>η → ∞</td><td>Vollk. elastisch</td><td class="wr">Sinkt auf 0</td><td>Homogene Güter</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>📊</span> Beispiel Funzel-Cola</div><div class="ex"><div class="ex-t">Gegeben</div><p class="st">Preis: 3,50€ → 3,70€ (ΔP=0,20€) · Menge: 100 → 85 (ΔQ=-15)</p><p class="st">η = (-15 / 0,20) × (3,50 / 100) = <b>2,625</b></p><p class="st">η > 1 → sehr elastisch → Preiserhöhung <b>senkt den Umsatz!</b></p></div></div><div class="cs"><div class="cs-lbl"><span>💡</span> Merkhilfe</div><div class="tip">η < 1 (unelastisch): Preiserhöhung → Umsatz STEIGT<br>η > 1 (elastisch): Preiserhöhung → Umsatz SINKT<br>Deutsche Bahn hat unelastische Nachfrage → Preiserhöhungen lohnen sich!</div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag ti">Instrument</span></div>
+      <h3>Make or Buy</h3>
+      <div class="prev">Eigenproduktion vs. Fremdvergabe</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📊</span> Entscheidungsmatrix</div><div class="tw"><table><tr><th>Pro Make (Eigen)</th><th>Pro Buy (Fremd)</th></tr><tr><td>Know-how-Schutz</td><td>Fixkosteneinsparung</td></tr><tr><td>Qualitätskontrolle</td><td>Fokus auf Kernkompetenzen</td></tr><tr><td>Liefertreue & Flexibilität</td><td>Variable statt fixe Kosten</td></tr><tr><td>Kapazitätsauslastung</td><td>Möglicherweise günstiger</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>💡</span> Entscheidungsregel</div><div class="tip">Quantitativ: var. Kosten Eigenproduktion < Einkaufspreis → Make.<br>Qualitative Faktoren (Know-how, Abhängigkeit, Qualität) immer mitbeachten!</div></div></div>
+</div>
+</div>
+<div class="view" id="view-risiko">
+<div class="mhd"><div class="mhd-icon">⚠️</div><div><h2>Risikocontrolling</h2><p>Grundlagen · 4 Risikoarten · 4-Phasen-Zyklus · Statistik · Value at Risk</p></div></div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">4.1 Grundlagen</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span><span class="tag tK">Klausur</span></div>
+      <h3>Was ist Risikocontrolling?</h3>
+      <div class="prev">Risiken früh erkennen · beurteilen · steuern · überwachen</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Definition Risiko</div><div class="ex"><p>Risiko = mögliches zukünftiges Ergebnis einer Handlung, das als <b>Gefahr (Schaden/Verlust)</b> empfunden wird und dessen Eintreten sowie Ausmaß <b>unsicher</b> ist.<br><em>Wortstamm: lat. „rischio/risco" = eine Klippe umschiffen</em></p></div></div><div class="cs"><div class="cs-lbl"><span>✅</span> Aufgabe des Risikocontrollings</div><ul class="kl"><li>Zukünftige risikobehaftete Entwicklungen <b>frühzeitig erkennen</b></li><li>Risiken <b>beurteilen, steuern, kommunizieren und überwachen</b></li><li>Ziel: Unternehmerische Existenz sichern, Transparenz schaffen</li><li>Unterstützungsfunktion für Unternehmensführung</li><li>Einhalten gesetzlicher Vorgaben (MaRisk, BASEL-Verordnungen)</li></ul></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span><span class="tag tK">Klausur</span></div>
+      <h3>4 Risikoarten</h3>
+      <div class="prev">Markt · Finanz · Leistung · Sonstige</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📊</span> Übersicht</div><div class="tw"><table><tr><th>Kategorie</th><th>Beispiele</th></tr><tr><td class="hi">1. Marktrisiken</td><td>Absatzmarkt (Kunden, Produkte, Regionen), Beschaffungsmarkt (Lieferanten)</td></tr><tr><td>2. Finanzrisiken</td><td>Liquiditätsrisiken, Ausfallrisiken (Forderungsausfall), Währungsrisiken</td></tr><tr><td>3. Leistungsrisiken</td><td>Personalrisiken (Churn, Kompetenz), Prozessrisiken (ineffiziente Abläufe)</td></tr><tr><td>4. Sonstige</td><td>Operationelle Risiken, Modellrisiken, gesellschaftliche, staatliche Risiken</td></tr></table></div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span><span class="tag tK">Klausur</span></div>
+      <h3>Risikocontrolling-Zyklus – alle 4 Phasen</h3>
+      <div class="prev">Identifikation → Bewertung → Steuerung → Kontrolle (Kreislauf!)</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📊</span> Der Zyklus</div><div class="flow"><div class="fb fa">1. Identifikation</div><span class="arr">→</span><div class="fb fg">2. Bewertung</div><span class="arr">→</span><div class="fb fy">3. Steuerung</div><span class="arr">→</span><div class="fb fp">4. Kontrolle</div></div><div class="conn">Kontinuierlicher Kreislauf – analog zum allgemeinen Controlling-Zyklus!</div></div><div class="cs"><div class="cs-lbl"><span>✅</span> Phase 1: Risikoidentifikation</div><ul class="kl"><li>Rein qualitativ – noch keine Beurteilung!</li><li>Frage: <b>Welche Risiken gibt es potenziell?</b></li><li>Instrumente: PEST(EL), Porters Five Forces, SWOT, Checklisten, Delphi-Methode</li></ul></div><div class="cs"><div class="cs-lbl"><span>✅</span> Phase 2: Risikobewertung & -aggregation</div><ul class="kl"><li>Frage: <b>Wie wahrscheinlich und wie gross ist der Schaden?</b></li><li>Wechselseitige Beziehungen zwischen Risiken berücksichtigen (Kausalketten)</li><li>Instrumente: <b>Risk Map</b>, <b>Value at Risk</b>, Monte-Carlo-Simulation, Szenarien</li><li><b>Risk Map</b> = Eintrittswahrscheinlichkeit × Schadenshöhe → Iso-Linien</li></ul></div><div class="cs"><div class="cs-lbl"><span>✅</span> Phase 3: Risikosteuerung (5 Strategien)</div><div class="tw"><table><tr><th>Strategie</th><th>Beschreibung</th></tr><tr><td>Risikovermeidung</td><td>Risiko im Ursprung beseitigen (Ausstieg aus Projekt/Markt)</td></tr><tr><td>Risikoverminderung</td><td>Schadenshöhe UND Wahrscheinlichkeit senken (Prävention, Schulungen)</td></tr><tr><td>Risikobegrenzung</td><td>Diversifikation (unkorrelierende Bereiche) + Limitierung (max. Risikogrenze)</td></tr><tr><td>Risikoüberwälzung</td><td>Finanzielle Wirkung auf Dritte übertragen (Versicherungen, Derivate)</td></tr><tr><td class="hi">Risikoakzeptanz</td><td class="hi">Risiko bewusst akzeptieren (wegen Gewinnchancen)</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>✅</span> Phase 4: Risikokontrolle & -kommunikation</div><ul class="kl"><li>Soll-Ist-Vergleich der Risikostrategie</li><li>Risikoupdates bei veränderten Rahmenbedingungen</li><li>Regelmässiges Risikoreporting (intern + extern), Ad-hoc Reporting</li><li>Aufbau einer <b>Risikokultur</b> bei allen Mitarbeitern</li></ul></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">4.2 Mathematische Grundlagen</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Formel</span><span class="tag tK">Klausur</span></div>
+      <h3>Erwartungswert, Varianz & Standardabweichung</h3>
+      <div class="prev">μ · σ² · σ – Grundlage des VaR</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📐</span> Formeln</div><div class="fm">μ = Σ (p_i × W_i) = arithmetisches Mittel<br><br>σ² = (1/n) × Σ (W_i − μ)² = Varianz (mittl. quadr. Abweichung)<br><br>σ = √σ² = Standardabweichung</div></div><div class="cs"><div class="cs-lbl"><span>📊</span> Beispiel</div><div class="ex"><div class="ex-t">W = {1, 3, 9, -7, 4, 11, 6, 3, 9, -8}</div><p class="st">μ = (1/10) × 31 = <b>3,1</b></p><p class="st">σ² = (1/10) × Σ(Wi-3,1)² = 37,09</p><p class="st">σ = √37,09 = <b>6,1</b></p><p class="st">→ Im Durchschnitt weichen die Werte 6,1 vom Mittelwert 3,1 ab.</p></div></div><div class="cs"><div class="cs-lbl"><span>💡</span> Bedeutung im Risikokontext</div><div class="tip">σ = Maß für Volatilität / Unsicherheit. Je höher σ, desto unsicherer die Risikoposition → desto höher der VaR!</div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Formel</span><span class="tag tK">Klausur</span></div>
+      <h3>Kovarianz & Korrelation</h3>
+      <div class="prev">Zusammenhang zwischen 2 Variablen · ρ ∈ {−1, 1}</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📐</span> Formeln</div><div class="fm">Cov(W1,W2) = (1/n) × Σ [(W1_i − μ1) × (W2_i − μ2)]<br><br>ρ = Cov(W1,W2) / (σ1 × σ2) → ρ ∈ {-1; 1}</div></div><div class="cs"><div class="cs-lbl"><span>📊</span> Beispiel & Interpretation</div><div class="ex"><div class="ex-t">Berechnung</div><p class="st">σ1=0,44 · σ2=0,28 · Cov=0,0644</p><p class="st">ρ = 0,0644 / (0,44 × 0,28) = <b>0,53</b> → positiv korreliert</p></div><div class="tw"><table><tr><th>ρ-Wert</th><th>Bedeutung</th><th>Auswirkung auf VaR</th></tr><tr><td>ρ = 1</td><td>Vollständig positiv korreliert</td><td>Kein Diversifikationseffekt</td></tr><tr><td>ρ > 0</td><td>Positiv korreliert</td><td>Geringer Diversifikationseffekt</td></tr><tr><td>ρ = 0</td><td>Vollständig unkorreliert</td><td>Diversifikation möglich</td></tr><tr><td class="ok">ρ < 0</td><td class="ok">Negativ korreliert</td><td class="ok">Starke Risikoreduktion!</td></tr><tr><td class="ok">ρ = -1</td><td class="ok">Vollst. negativ korreliert</td><td class="ok">Maximale Risikoreduktion</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>💡</span> Merkhilfe</div><div class="tip">Negativ korrelierte Positionen im Portfolio → Risikoreduzierung durch Diversifikation! Strategie "Risikobegrenzung" basiert genau darauf.</div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Formel</span><span class="tag tK">Klausur</span></div>
+      <h3>Standardnormalverteilung & z-Wert</h3>
+      <div class="prev">z = (x − μ) / σ → Φ(z) aus Tabelle ablesen</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📐</span> Formel</div><div class="fm">z = (x − μ) / σ → Φ(z) aus Standardnormalverteilungstabelle</div></div><div class="cs"><div class="cs-lbl"><span>📖</span> Was ist die Standardnormalverteilung?</div><ul class="kl"><li>Normalverteilung mit μ=0 und σ=1</li><li>Jede beliebige Normalverteilung kann mit z-Formel standardisiert werden</li><li>Wichtige Marken: ±1σ ≈ 68% · ±2σ ≈ 95% · ±3σ ≈ 99,7%</li></ul></div><div class="cs"><div class="cs-lbl"><span>📊</span> Klausurbeispiel – Kerze (μ=40h, σ=7h)</div><div class="ex"><div class="ex-t">Frage 1: P(Kerze brennt bis 47h)?</div><p class="st">z = (47-40) / 7 = <b>1</b></p><p class="st">Aus Tabelle: Φ(1) = <b>0,84 = 84%</b></p></div><div class="ex"><div class="ex-t">Frage 2: Wie lange brennt sie mit 80%?</div><p class="st">Φ(z) = 0,80 → aus Tabelle: z = <b>0,85</b></p><p class="st">x = z × σ + μ = 0,85 × 7 + 40 = <b>45,95h</b></p></div></div><div class="cs"><div class="cs-lbl"><span>💡</span> Für den VaR</div><div class="tip">95% Konfidenzniveau → z = 1,645 (Interpolation: (1,64+1,65)/2)<br>Im VaR negativ setzen: z_α = <b>-1,645</b> (linke Verlustseite!)</div></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">4.3 Value at Risk (VaR)</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Formel</span><span class="tag tK">Klausur</span></div>
+      <h3>VaR – Definition, Formel & Schritt-für-Schritt</h3>
+      <div class="prev">Max. Verlust bei gegebener Wahrscheinlichkeit und Haltedauer</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Definition</div><div class="ex"><p>Absoluter Wertverlust einer Risikoposition, der mit einer definierten Wahrscheinlichkeit (<b>Konfidenzniveau</b>) innerhalb einer definierten Haltedauer <b>nicht überschritten</b> wird.</p></div></div><div class="cs"><div class="cs-lbl"><span>📐</span> VaR-Formel</div><div class="fm">VaR = −(μ_RP + z_α × σ_RP) × P_RP<br><br>μ_RP = Erwartungswert · z_α = z-Wert (negativ!) · σ_RP = Stabw · P_RP = Volumen</div></div><div class="cs"><div class="cs-lbl"><span>✅</span> Schritt 1: Erwartungswert (gewichtet)</div><div class="fm">μ = p1 × EW1 + p2 × EW2</div><div class="ex"><div class="ex-t">Beispiel</div><p class="st">Wert1: EW=1,36%, Gewicht=40% | Wert2: EW=1,77%, Gewicht=60%</p><p class="st">μ = 0,4×1,36% + 0,6×1,77% = 0,544% + 1,062% = <b>1,61%</b></p></div></div><div class="cs"><div class="cs-lbl"><span>✅</span> Schritt 2: Portfolio-Standardabweichung</div><div class="fm">σ_P = √(x1²×σ1² + x2²×σ2² + 2×x1×x2×σ1×σ2×ρ)</div><div class="ex"><div class="ex-t">Beispiel</div><p class="st">x1=40%, x2=60%, σ1=3,88%, σ2=2,19%, ρ=-0,244</p><p class="st">σ_P = √(0,16×0,0388² + 0,36×0,0219² + 2×0,4×0,6×0,0388×0,0219×(-0,244))</p><p class="st"><b>σ_P = 1,97%</b> (neg. Korrelation reduziert Portfolio-Risiko!)</p></div></div><div class="cs"><div class="cs-lbl"><span>✅</span> Schritt 3: Konfidenzniveau (z-Wert)</div><div class="ex"><div class="ex-t">95% Konfidenzniveau</div><p class="st">Aus Tabelle: Φ(1,645) ≈ 0,9500</p><p class="st">Interpolation: (1,64+1,65)/2 = 1,645</p><p class="st">z_α = <b>-1,645</b> (negativ = Verlustseite!)</p></div></div><div class="cs"><div class="cs-lbl"><span>✅</span> Schritt 4: VaR berechnen</div><div class="ex"><div class="ex-t">Finales Beispiel</div><p class="st">μ=1,61% · σ_P=1,97% · z=-1,645 · P=100.000€</p><p class="st">VaR = -(1,61% + (-1,645) × 1,97%) × 100.000</p><p class="st">VaR = -(1,61% - 3,24%) × 100.000 = -(-1,63%) × 100.000</p><p class="st"><b>VaR = 1.630,65€</b></p></div><div class="tip">Aussage: Mit <b>95% Wahrscheinlichkeit</b> und Haltedauer <b>1 Tag</b> übersteigt der Verlust <b>1.630,65€ nicht</b>.</div></div><div class="cs"><div class="cs-lbl"><span>⚠️</span> Grenzen des VaR</div><ul class="kl"><li>Beschreibt nur die Grenze – nicht was bei <b>Black-Swan-Ereignissen</b> passiert</li><li>Vereinfachung: Ist die Welt wirklich normalverteilt?</li><li>Periodizität nicht berücksichtigt (<b>Truthahn-Syndrom</b>)</li><li>Lösung: VaR als Teil eines Kennzahlensystems + Szenarioanalysen</li></ul></div></div>
+</div>
+</div>
+<div class="view" id="view-digital">
+<div class="mhd"><div class="mhd-icon">🤖</div><div><h2>Digital Controlling</h2><p>Digitalisierung · 4 Wellen · Predictive Analytics · 5 Instrumente · KI-Kritik</p></div></div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">5.1 Digitalisierung & Digital Controlling</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span></div>
+      <h3>Was ist Digitalisierung?</h3>
+      <div class="prev">Transformation · Disruption · Industrie 1.0–5.0</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Definition</div><ul class="kl"><li>Anfangs: Umwandlung analoger → digitaler Informationen</li><li>Heute: Kommunikation + Modifikation von Instrumenten, Geräten, Fahrzeugen</li><li>Themen: E-Commerce, IoT, Predictive Maintenance, KI, Blockchain, Big Data, Cloud</li><li><b>Digitale Transformation</b> = Änderung von Geschäftsmodellen (z.B. Online-Zeitung + Paywall)</li><li><b>Disruption</b> = Veränderung und Ablösung bestehender Geschäftsmodelle</li></ul></div><div class="cs"><div class="cs-lbl"><span>📊</span> Von Industrie 1.0 zu 5.0</div><div class="tw"><table><tr><th>Phase</th><th>Epoche</th><th>Merkmale</th></tr><tr><td>1.0</td><td>18. Jhd.</td><td>Mechanische Produktion (Wasser/Dampf)</td></tr><tr><td>2.0</td><td>19./20. Jhd.</td><td>Elektrifizierung + Massenproduktion (Fliessband)</td></tr><tr><td>3.0</td><td>1970er</td><td>IT-gestützte Automatisierung, Verlagerung Niedriglohnländer</td></tr><tr><td>4.0</td><td>ca. 2010</td><td>Vernetzung, Cyber-Physical-Systeme, Smart Factory, IoT</td></tr><tr><td class="hi">5.0</td><td>Heute</td><td>AI + Mensch-Maschine-Kollaboration, Massendaten via Sensoren</td></tr></table></div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span><span class="tag tK">Klausur</span></div>
+      <h3>4 digitale Wellen des Controllings (PWC)</h3>
+      <div class="prev">Datensammler → Analyst → Beratung → Strategisches Instrument</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📊</span> Die 4 Wellen</div><div class="flow"><div class="fb fa">1. Datensammler</div><span class="arr">→</span><div class="fb fg">2. Datenanalyst</div><span class="arr">→</span><div class="fb fy">3. Mgmt-Beratung</div><span class="arr">→</span><div class="fb fp">4. Strategisch</div></div></div><div class="cs"><div class="cs-lbl"><span>✅</span> Neues Skill-Set</div><div class="tw"><table><tr><th>Controlling-Skills</th><th>IT-Skills (neu!)</th></tr><tr><td>End-to-End-Prozesse</td><td>Datenaufbereitung</td></tr><tr><td>Handlungsempfehlungen</td><td>Data Insights erarbeiten</td></tr><tr><td>Compliance</td><td>Visualisierung</td></tr><tr><td>Priorisierung</td><td>Predictive Analytics</td></tr><tr><td>Prozessoptimierung</td><td>Automatisierung repetitiver Tätigkeiten</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>⚠️</span> Herausforderungen</div><ul class="kl"><li>Komplexität → Chancen/Risiken schwer einschätzbar (Digital Roadmap nötig)</li><li>Datenschutz → hohe Anforderungen, Schwachstelle Mensch</li><li>Neues Tätigkeitsprofil nicht im Unternehmen vorhanden</li><li><b>Kein Trend, sondern grundlegende Veränderung</b> (Paradigmenwechsel)</li></ul></div><div class="cs"><div class="cs-lbl"><span>💡</span> Zitat</div><div class="tip">"AI won't take your job, but someone who understands AI will." – Scott Galloway</div></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">5.2 Predictive Analytics – Grundbegriffe</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Definition</span><span class="tag tK">Klausur</span></div>
+      <h3>Predictive Analytics, Data Mining, KI, ML, BI</h3>
+      <div class="prev">5 Konzepte klar unterscheiden</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📊</span> Die 5 Konzepte</div><div class="tw"><table><tr><th>Begriff</th><th>Definition</th></tr><tr><td class="hi">Predictive Analytics</td><td>Verwendung math.-stat. Verfahren + Data-Mining-Algorithmen um Muster aus BigData zu erkennen</td></tr><tr><td>Data Mining (KDD)</td><td>Extraktion empirischer Zusammenhänge aus Datenbasis</td></tr><tr><td>KI / AI</td><td>Aus Daten Muster erkennen → IT-Systeme lernen lassen → automatisch Lösungen finden</td></tr><tr><td>Machine Learning</td><td>Technik, mit der Maschinen Wissen vermittelt wird</td></tr><tr><td>Business Intelligence</td><td>IT-gestützte Aufbereitung und Analyse von Unternehmensdaten</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>📊</span> 3 ML-Arten</div><div class="tw"><table><tr><th>Art</th><th>Daten</th><th>Output</th><th>Beispiel</th></tr><tr><td class="hi">Überwachtes Lernen</td><td>Beschriftet (gelabelt)</td><td>Vorgegeben</td><td>Kreditentscheidung</td></tr><tr><td>Unüberwachtes Lernen</td><td>Unbeschriftet</td><td>Unbekannt</td><td>Clustering</td></tr><tr><td>Deep Learning</td><td>Gross + komplex</td><td>Viele Layer</td><td>Bilderkennung</td></tr></table></div></div></div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">5.3 Die 5 Instrumente</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag ti">Instrument</span><span class="tag tK">Klausur</span></div>
+      <h3>1. Regressionsanalyse</h3>
+      <div class="prev">Beziehungen zwischen Variablen → Vorhersagen treffen</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Was ist Regression?</div><ul class="kl"><li>Statistisches Verfahren zur Modellierung von Beziehungen zwischen Variablen</li><li>Voraussetzung: <b>Kausalzusammenhang</b> (Korrelation) zwischen Variablen</li><li>Einfache vs. multiple | Lineare vs. nicht-lineare Regression</li><li>Ergebnis: Regressionskoeffizienten → Regressionsgerade f(x)</li></ul></div><div class="cs"><div class="cs-lbl"><span>📊</span> Beispiel Eiskugeln</div><div class="ex"><div class="ex-t">Formel: f(x) = 12,7x + 20</div><p class="st">x = Temperatur in Grad C | f(x) = verkaufte Kugeln</p><p class="st">Bei x=30°C: f(30) = 12,7×30 + 20 = <b>401 Kugeln</b></p><p class="st">→ Wettervorhersage einsetzen → Absatzprognose direkt berechnen!</p></div></div><div class="cs"><div class="cs-lbl"><span>🔗</span> Zusammenhang Controlling</div><div class="conn">Regression = Basis für automatisiertes Forecasting (Umsatzprognosen, Bedarfsplanung, Risikomodelle)</div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag ti">Instrument</span><span class="tag tK">Klausur</span></div>
+      <h3>2. Assoziationsanalyse (Warenkorbanalyse)</h3>
+      <div class="prev">Support · Konfidenz · Lift</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Was ist Assoziationsanalyse?</div><ul class="kl"><li>Identifikation von Objekt-Zusammenhängen (Item-Sets) in einer Datenbasis</li><li>Häufige Verwendung: <b>Warenkorbanalyse</b> (Was wird zusammen gekauft?)</li><li>Basis: Häufigkeiten und Wahrscheinlichkeiten</li></ul></div><div class="cs"><div class="cs-lbl"><span>📐</span> 3 Güte-KPIs</div><div class="tw"><table><tr><th>KPI</th><th>Formel</th><th>Bedeutung</th></tr><tr><td>Support</td><td>P(Item-Set) = Häufigkeit / Transaktionen</td><td>Wie oft kommt Item-Set vor?</td></tr><tr><td>Konfidenz</td><td>P(X→Y) / P(X)</td><td>Wenn X, dann Y mit x%?</td></tr><tr><td class="hi">Lift</td><td>Konfidenz / P(Y)</td><td>Lift >1 = statistisch relevant!</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>📊</span> Beispiel {Brot, Milch}</div><div class="ex"><div class="ex-t">4 Transaktionen: 3× {Brot,Milch}, 5× Brot, 4× Milch</div><p class="st">Support = 3/4 = <b>75%</b></p><p class="st">Konfidenz = 3/5 = <b>60%</b> (wenn Brot → 60% auch Milch)</p><p class="st">P(Milch) = 4/5 = 80% → Lift = 0,60/0,80 = <b>0,75 <1</b> (kein Steigerungseffekt)</p></div></div><div class="cs"><div class="cs-lbl"><span>🔗</span> Zusammenhang Controlling</div><div class="conn">→ Cross-Selling-Empfehlungen im Vertrieb, Sortimentsoptimierung, Lagerplanung</div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag ti">Instrument</span><span class="tag tK">Klausur</span></div>
+      <h3>3. Cluster-Analyse</h3>
+      <div class="prev">Homogene Gruppen bilden · K-Means · Hierarchisch</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Was ist Cluster-Analyse?</div><ul class="kl"><li>Objekte in möglichst <b>homogene Gruppen</b> einteilen</li><li>Gruppen möglichst <b>heterogen</b> voneinander abgrenzen</li><li>Cluster-Merkmale bilden sich <b>während</b> der Clusterbildung (nicht vorab!)</li></ul></div><div class="cs"><div class="cs-lbl"><span>📊</span> Hierarchisch vs. Partitionierend</div><div class="tw"><table><tr><th>Methode</th><th>Vorgehen</th></tr><tr><td>Hierarchisch (agglomerativ)</td><td>Bottom-Up: jedes Objekt = eigener Cluster → nach Ähnlichkeit zusammenführen</td></tr><tr><td class="ok">Partitionierend (K-Means)</td><td class="ok">K vorgegeben → Mittelwerte → Objekte nächstem Cluster → iterativ verbessern</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>📊</span> Beispiel Kundengruppen</div><div class="tw"><table><tr><th>Cluster</th><th>Einkommen</th><th>Alter</th><th>Empfehlung</th></tr><tr><td class="ok">Cluster 1</td><td class="ok">Hoch</td><td>Gering</td><td class="ok">A-Kunden – Priorisierung hoch</td></tr><tr><td>Cluster 2</td><td>Gering</td><td>Gering</td><td>B-Kunden – Potenzial</td></tr><tr><td class="wr">Cluster 3</td><td class="wr">Gering</td><td class="wr">Hoch</td><td class="wr">C-Kunden – auslaufen lassen</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>🔗</span> Zusammenhang</div><div class="conn">Cluster-Analyse = automatisierte ABC-Klassifikation. Kombination mit Kunden-DB-Rechnung und CLV.</div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag ti">Instrument</span><span class="tag tK">Klausur</span></div>
+      <h3>4. Klassifikation & Entscheidungsbäume</h3>
+      <div class="prev">Decision Trees · Entropie · Information Gain</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Was ist Klassifikation?</div><ul class="kl"><li>Datensätze mit <b>vordefinierten Klassen</b> → überwachtes Lernen</li><li><b>Decision Trees:</b> Entscheidungsknoten + Äste → jeder Ast = Klasse</li><li>Weiterentwicklung: <b>Random Forest</b> = viele Decision Trees kombiniert</li></ul></div><div class="cs"><div class="cs-lbl"><span>📐</span> Entropie & Information Gain</div><div class="fm">Entropie = −Σ (p_i × log₂(p_i))<br>Hohe Entropie = hohe Unordnung = schlechte Klassifizierung<br><br>Information Gain = Entropie_gesamt − Entropie_Attribut<br>Je höher IG → desto besser der Split</div></div><div class="cs"><div class="cs-lbl"><span>📊</span> Beispiel Kreditentscheidung</div><div class="tw"><table><tr><th>Attribut</th><th>Entropie_gesamt</th><th>Entropie_Attr.</th><th>Info Gain</th></tr><tr><td class="hi">Alter</td><td>0,99</td><td>0,679</td><td class="hi">0,311</td></tr><tr><td class="hi">Einkommen</td><td>0,99</td><td>0,679</td><td class="hi">0,311</td></tr><tr><td>Student</td><td>0,99</td><td>0,857</td><td>0,133</td></tr></table></div><p class="st" style="font-size:12px;color:var(--text2);margin-top:6px">→ Alter und Einkommen als erste Splits wählen (höchster IG)!</p></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag ti">Instrument</span></div>
+      <h3>5. Neuronale Netze</h3>
+      <div class="prev">Input → Hidden Layer (Black Box) → Output</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>📖</span> Aufbau</div><div class="tw"><table><tr><th>Schicht</th><th>Funktion</th></tr><tr><td>Input Layer</td><td>Empfängt Daten, gibt sie gewichtet weiter</td></tr><tr><td class="hi">Hidden Layer(s)</td><td>Trifft Entscheidung in mehrstufigem Prozess (Black Box!)</td></tr><tr><td>Output Layer</td><td>Gibt das Ergebnis aus</td></tr></table></div></div><div class="cs"><div class="cs-lbl"><span>📊</span> Beispielrechnung</div><div class="ex"><div class="ex-t">Inputs: C1=1, C2=0,6, C3=0,3 | Gewichte: 0,6, -0,4, 0,1</div><p class="st">Summe = 1×0,6 + 0,6×(-0,4) + 0,3×0,1 = 0,6-0,24+0,03 = 0,39</p><p class="st">Aktivierungsfunktion: f(x) = x wenn x>0, sonst 0 → Output = <b>0,39</b></p></div></div></div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tk">Kritisch</span><span class="tag tK">Klausur</span></div>
+      <h3>Kritische Aspekte der AI-Nutzung</h3>
+      <div class="prev">Halluzinationen · Black Box · Kosten · Daten</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb"><div class="cs"><div class="cs-lbl"><span>⚠️</span> Probleme in der Praxis</div><ul class="kl"><li><b>KI-Halluzinationen</b> – AI gibt falsche Antworten mit hoher Konfidenz</li><li><b>Black Box</b> – Entscheidungsgrundlage nicht nachvollziehbar (Problem für Compliance!)</li><li><b>Gläserner Mitarbeiter</b> – Datenweitergabe für Training nötig</li><li><b>Datenqualität</b> – Datenmanipulation möglich, Daten ggf. ausgeschöpft</li><li><b>Kosten:</b> Humankosten (Labeling), Energie, Wasser</li></ul></div><div class="cs"><div class="cs-lbl"><span>💡</span> Fazit</div><div class="tip">AI ist kein Allheilmittel. Controller müssen AI als <b>Werkzeug</b> einsetzen – nicht blind vertrauen. Rationalitätssicherung bleibt Aufgabe des Menschen!</div></div></div>
+</div>
+</div>
+<div class="view" id="view-zshg">
+<div class="mhd"><div class="mhd-icon">🔗</div><div><h2>Zusammenhänge</h2><p>Wie alle 5 Module miteinander verknüpft sind</p></div></div>
+<div class="zc"><div class="zc-t">🔄 Der universelle Controlling-Kreislauf</div><p>Planung → Kontrolle (Soll-Ist) → Steuerung (Massnahmen) → Planung (Kreislauf!)<br>Gilt für <b>alle 5 Module</b>. Das allgemeine Controlling koordiniert alle Teilbereiche systembildend + systemkoppelnd.</p></div>
+<div class="zc"><div class="zc-t">🏗️ Wie die 5 Module zusammenhängen</div><p><b>Vertrieb</b> plant Absatz → <b>Produktion</b> plant Kapazität → <b>Controlling</b> koordiniert → <b>Führung</b> entscheidet.<br>• <b>Risikocontrolling</b> liefert Szenarien für alle Module<br>• <b>Digital Controlling</b> automatisiert Datenflüsse und Forecasts<br>• <b>Allgemeines C.</b> = koordinierende Klammer</p></div>
+<div class="zc"><div class="zc-t">💰 DB-Logik verbindet alle Module</div><p>• <b>Allgemein:</b> DB einstufig/mehrstufig – Grundlage<br>• <b>Vertrieb:</b> Kunden-DB → Welcher Kunde lohnt sich?<br>• <b>Vertrieb:</b> CLV → Barwert der Kundenbeziehung über Zeit<br>• <b>Produktion:</b> Produkt-DB → Welches Produkt trägt bei?<br>• <b>Produktion Engpass:</b> <b>Relativer DB/Einheit</b> – NICHT absoluter DB!</p></div>
+<div class="zc"><div class="zc-t">📊 Pareto / ABC – überall dieselbe Logik</div><p>80/20-Regel in allen Bereichen:<br>• <b>Vertrieb:</b> 20% Kunden → 80% Umsatz<br>• <b>Einkauf:</b> 20% Artikel → 80% Kosten<br>• <b>Digital:</b> Cluster-Analyse identifiziert diese 20% automatisch</p></div>
+<div class="zc"><div class="zc-t">📈 Lebenszyklus-Konzepte verknüpft</div><p><b>Produktlebenszyklus:</b> Einführung → Wachstum → Reife → Sättigung → Abschwung<br><b>BCG-Matrix:</b> Question Mark → Star → Cash Cow → Poor Dog<br><b>Kundenlebenszyklus:</b> Awareness → Conversion → Retention → Recovery<br>→ Alle drei beschreiben denselben Lebensbogen aus verschiedener Perspektive!</p></div>
+<div class="zc"><div class="zc-t">🤖 Digital Controlling erweitert alle Module</div><p>• <b>Regression</b> → automatisierte Umsatz-/Absatzforecasts<br>• <b>Cluster-Analyse</b> → automatische ABC-Klassifikation<br>• <b>Decision Trees</b> → automatische Risikoklassifikation<br>• <b>Assoziationsanalyse</b> → Cross-Selling-Empfehlungen im Vertrieb</p></div>
+<div class="zc"><div class="zc-t">🔢 Statistik verbindet Risiko & Digital</div><p>• <b>Erwartungswert μ</b> → Basis für VaR und Regression<br>• <b>Standardabweichung σ</b> → Maß für Risiko im VaR<br>• <b>Korrelation ρ</b> → Portfolio-Risiko und Clustervoraussetzungen<br>→ Mathematische Grundlagen sind das Fundament beider Module!</p></div>
+<div class="zc"><div class="zc-t">⚖️ Operativ vs. Strategisch – Schnellvergleich</div><p><b>Operativ</b> (1-3 J.): Effizienz · intern · quantitativ · sicher<br>Instrumente: DB, Break-Even, Soll-Ist, ABC, Preiselastizität, VaR<br><br><b>Strategisch</b> (5-10 J.): Effektivität · extern · qualitativ · unsicher<br>Instrumente: SWOT, BCG, Balanced Scorecard, Cluster-Analyse, CLV</p></div>
+</div>
+<div class="view" id="view-uebung">
+<div class="mhd"><div class="mhd-icon">📝</div><div><h2>Übungsaufgaben</h2><p>Direkt aus den Klausurvorbereitungsfolien · Aufklappen für Lösung</p></div></div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">Allgemeines Controlling</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Wissensfrage</span><span class="tag tK">Klausur</span></div>
+      <h3>Aufgabe 1 – 6 Controllingfunktionen benennen</h3>
+      <div class="prev">Nennen Sie die jeweils beschriebene Controllingaufgabe:
+1. Budgetierung von Kost...</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb">
+    <div class="cs">
+      <div class="cs-lbl"><span>❓</span> Aufgabenstellung</div>
+      <div class="ex"><p style="font-size:13px;color:var(--text);line-height:1.6">Nennen Sie die jeweils beschriebene Controllingaufgabe:
+1. Budgetierung von Kostenstellen und Projekten, abgestimmtes Zielsystem
+2. Abweichungsanalysen (ex post und ex ante)
+3. Eingreifen und Handlungsempfehlungen erarbeiten
+4. MIS aufbauen, Berichtswesen mit KPIs
+5. Systembildender und systemkoppelnder Controlling-Ansatz
+6. Controlling als Korrektiv der Führungsebene</p></div>
+    </div>
+    <div class="cs">
+      <div class="cs-lbl"><span>✅</span> Lösung</div>
+      <div class="tw"><table><tr><th>Nr.</th><th>Beschreibung</th><th>Funktion</th></tr><tr><td>1</td><td>Budgetierung, abgestimmtes Zielsystem</td><td class="hi">Planungsfunktion</td></tr><tr><td>2</td><td>Abweichungsanalysen (ex post + ex ante)</td><td class="hi">Kontrollfunktion</td></tr><tr><td>3</td><td>Handlungsempfehlungen, Eingreifen</td><td class="hi">Steuerungsfunktion</td></tr><tr><td>4</td><td>MIS aufbauen, KPI-Berichtswesen</td><td class="hi">Informationsfunktion</td></tr><tr><td>5</td><td>Systembildend + systemkoppelnd</td><td class="hi">Koordinationsfunktion</td></tr><tr><td>6</td><td>Korrektiv der Führungsebene</td><td class="hi">Rationalitätssicherungsfunktion</td></tr></table></div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Wissensfrage</span><span class="tag tK">Klausur</span></div>
+      <h3>Aufgabe 2 – Operativ vs. Strategisch – 3 Merkmale</h3>
+      <div class="prev">Unterscheiden Sie das operative und das strategische Controlling anhand von drei...</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb">
+    <div class="cs">
+      <div class="cs-lbl"><span>❓</span> Aufgabenstellung</div>
+      <div class="ex"><p style="font-size:13px;color:var(--text);line-height:1.6">Unterscheiden Sie das operative und das strategische Controlling anhand von drei geeigneten Merkmalen. (6 Punkte)</p></div>
+    </div>
+    <div class="cs">
+      <div class="cs-lbl"><span>✅</span> Lösung</div>
+      <div class="tw"><table><tr><th>Merkmal</th><th>Operativ</th><th>Strategisch</th></tr><tr><td>Zeitraum</td><td class="hi">1–3 Jahre</td><td class="ok">5–10 Jahre</td></tr><tr><td>Ziel</td><td class="hi">Wirtschaftlichkeit / Effizienz</td><td class="ok">Erfolgspotentiale / Effektivität</td></tr><tr><td>Motto</td><td class="hi">Dinge richtig tun</td><td class="ok">Richtige Dinge tun</td></tr><tr><td>Orientierung</td><td>Intern</td><td>Extern</td></tr><tr><td>Daten</td><td>Quantitativ / Monetär</td><td>Qualitativ / Unsicher</td></tr></table></div><div class="tip">Pro Merkmal gibt es 2 Punkte (operativ + strategisch). Mindestens Zeitraum, Ziel und Motto nennen!</div>
+    </div>
+  </div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">Controlling-Instrumente</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag ti">Wahr/Falsch</span><span class="tag tK">Klausur</span></div>
+      <h3>Aufgabe 3 – Wahr oder Falsch – Controlling-Instrumente</h3>
+      <div class="prev">Sind folgende Aussagen wahr oder falsch?
+1. SWOT analysiert interne Chancen/Risi...</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb">
+    <div class="cs">
+      <div class="cs-lbl"><span>❓</span> Aufgabenstellung</div>
+      <div class="ex"><p style="font-size:13px;color:var(--text);line-height:1.6">Sind folgende Aussagen wahr oder falsch?
+1. SWOT analysiert interne Chancen/Risiken und externe Stärken/Schwächen.
+2. Der Produktlebenszyklus kann exakt beschreiben, in welchem Stadium sich ein Produkt befindet.
+3. Nutzwertanalyse kombiniert qualitative und quantitative Faktoren und liefert eindeutig die geeignetste Option.
+4. Bei der Portfolioanalyse haben Poor Dogs und Fragezeichen den geringsten Marktanteil.
+5. Porters Five beschreibt fünf externe Kräfte, die auf ein Unternehmen einwirken.</p></div>
+    </div>
+    <div class="cs">
+      <div class="cs-lbl"><span>✅</span> Lösung</div>
+      <div class="tw"><table><tr><th>Nr.</th><th>Aussage</th><th>Antwort</th><th>Erklärung</th></tr><tr><td>1</td><td>SWOT: interne C/R + externe S/W</td><td class="wr">FALSCH</td><td>SWOT: intern = Stärken/Schwächen (S/W), extern = Chancen/Risiken (O/T) – genau andersrum!</td></tr><tr><td>2</td><td>PLC kann exakt Stadium bestimmen</td><td class="wr">FALSCH</td><td>Grenzen: Phase nicht exakt bestimmbar, Kurvenform variiert, keine Aussage über Dauer</td></tr><tr><td>3</td><td>Nutzwertanalyse liefert eindeutig beste Option</td><td class="wr">FALSCH</td><td>Subjektive Gewichtungen → Manipulation möglich, keine Garantie für optimale Wahl</td></tr><tr><td>4</td><td>Poor Dogs + Fragezeichen: geringster Marktanteil</td><td class="ok">WAHR</td><td>Beide haben niedrigen rel. Marktanteil – unterscheiden sich im Marktwachstum</td></tr><tr><td>5</td><td>Porters Five = 5 externe Kräfte</td><td class="ok">WAHR</td><td>Rivalität, neue Anbieter, Lieferanten, Abnehmer, Ersatzprodukte (+Regierung)</td></tr></table></div>
+    </div>
+  </div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">Deckungsbeitragsrechnung</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Rechenaufgabe</span><span class="tag tK">Klausur</span></div>
+      <h3>Aufgabe 4 – Mehrstufige DB-Rechnung + Programmoptimierung</h3>
+      <div class="prev">Produkte A, B, C, D. Kapazität: 2.580 Std. (154.800 Min.)
+Preise: A=9,2€ | B=21,...</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb">
+    <div class="cs">
+      <div class="cs-lbl"><span>❓</span> Aufgabenstellung</div>
+      <div class="ex"><p style="font-size:13px;color:var(--text);line-height:1.6">Produkte A, B, C, D. Kapazität: 2.580 Std. (154.800 Min.)
+Preise: A=9,2€ | B=21,6€ | C=29,5€ | D=22,5€
+Var. Kosten: A=5€ | B=9,2€ | C=9,8€ | D=17,1€
+Mengen: A=4.550 | B=4.600 | C=2.400 | D=2.100
+Absetzbar: A=4.600 | B=4.600 | C=2.700 | D=3.900
+Fertigungszeit: A=6Min | B=15Min | C=13Min | D=20Min
+Erzeugnisfixkosten: A=6.950€ | B=13.450€ | C=16.800€ | D=11.440€
+Gruppenfixkosten: A+B=9.580€ | C+D=14.560€
+Unternehmensfixkosten: 24.190€
+
+Aufgaben: 1. Betriebsergebnis bei aktueller Palette. 2. Optimales Programm. 3. Neues Betriebsergebnis.</p></div>
+    </div>
+    <div class="cs">
+      <div class="cs-lbl"><span>✅</span> Lösung</div>
+      <div class="cs-lbl"><span>📊</span> Schritt 1: Aktuelles Betriebsergebnis</div><div class="tw"><table><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr><tr><td>Erlös</td><td>41.860</td><td>99.360</td><td>70.800</td><td>47.250</td></tr><tr><td>- var. Kosten</td><td>22.750</td><td>42.320</td><td>23.520</td><td>35.910</td></tr><tr><td class="hi">DB I</td><td class="hi">19.110</td><td class="hi">57.040</td><td class="hi">47.280</td><td class="hi">11.340</td></tr><tr><td>- Erz.fixe</td><td>6.950</td><td>13.450</td><td>16.800</td><td>11.440</td></tr><tr><td class="hi">DB II</td><td class="hi">12.160</td><td class="hi">43.590</td><td class="hi">30.480</td><td class="hi">-100</td></tr><tr><td>- Gruppen-FK</td><td>9.580 (A+B)</td><td>9.580 (A+B)</td><td>14.560 (C+D)</td><td>14.560 (C+D)</td></tr><tr><td class="hi">DB III</td><td class="hi">46.170 (A+B)</td><td class="hi">46.170 (A+B)</td><td class="hi">15.820 (C+D)</td><td class="hi">15.820 (C+D)</td></tr><tr><td>- UFix</td><td>24.190</td><td>–</td><td>–</td><td>–</td></tr><tr><td class="ok">EBIT</td><td class="ok">37.800</td><td>–</td><td>–</td><td>–</td></tr></table></div><div class="cs-lbl" style="margin-top:12px"><span>📊</span> Schritt 2: Programmoptimierung bei Engpass (DB/Min.)</div><div class="tw"><table><tr><th>Produkt</th><th>DB/Stk</th><th>Zeit (Min)</th><th>DB/Min</th><th>Rang</th><th>Max (Std)</th><th>Tats. Min.</th><th>Menge</th></tr><tr><td>A</td><td>4,2</td><td>6</td><td>0,70</td><td>4</td><td>4.600</td><td>–</td><td>460</td></tr><tr><td class="hi">B</td><td class="hi">12,4</td><td class="hi">15</td><td class="hi">0,83</td><td class="hi">3</td><td class="hi">4.600</td><td class="hi">–</td><td class="hi">–</td></tr><tr><td class="ok">C</td><td class="ok">19,7</td><td class="ok">13</td><td class="ok">1,52</td><td class="ok">2</td><td class="ok">2.700</td><td class="ok">–</td><td class="ok">–</td></tr><tr><td class="ok">D</td><td class="ok">5,4</td><td class="ok">20</td><td class="ok">0,27</td><td class="ok">1 (???)</td><td class="ok">3.900</td><td class="ok">–</td><td class="ok">–</td></tr></table></div><div class="warn">⚠️ Laut Musterlösung: Rang 1=D(65), 2=C(59), 3=B(50), 4=A(42) – DB/Std. Formel: DB/Stk × 60/Zeit</div><div class="tw"><table><tr><th>Produkt</th><th>DB/Stk</th><th>Zeit (Min)</th><th>DB/Std</th><th>Rang</th><th>Min. belegt</th><th>Menge</th></tr><tr><td class="ok">D</td><td class="ok">5,4</td><td class="ok">20</td><td class="ok">65</td><td class="ok">1</td><td class="ok">3.900×20=78.000</td><td class="ok">3.900</td></tr><tr><td class="ok">C</td><td class="ok">19,7</td><td class="ok">13</td><td class="ok">59</td><td class="ok">2</td><td class="ok">2.700×13=35.100</td><td class="ok">2.700</td></tr><tr><td>B</td><td>12,4</td><td>15</td><td>50</td><td>3</td><td>154.800-78.000-35.100=41.700→2.780</td><td>2.780 (nicht 4.600!)</td></tr><tr><td class="wr">A</td><td class="wr">4,2</td><td class="wr">6</td><td class="wr">42</td><td class="wr">4</td><td class="wr">kein Rest</td><td class="wr">0 (kein Platz)</td></tr></table></div><div class="cs-lbl" style="margin-top:12px"><span>📊</span> Schritt 3: Neues Betriebsergebnis</div><div class="tw"><table><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr><tr><td>Erlös</td><td>0</td><td>60.048</td><td>79.650</td><td>87.750</td></tr><tr><td>- var. Kosten</td><td>0</td><td>25.576</td><td>26.460</td><td>66.690</td></tr><tr><td class="hi">DB I</td><td class="hi">0</td><td class="hi">34.472</td><td class="hi">53.190</td><td class="hi">21.060</td></tr><tr><td>- Erz.fixe</td><td>6.950</td><td>13.450</td><td>16.800</td><td>11.440</td></tr><tr><td class="hi">DB II</td><td class="hi">-6.950</td><td class="hi">21.022</td><td class="hi">36.390</td><td class="hi">9.620</td></tr><tr><td>- Gruppen-FK</td><td>9.580 (A+B)</td><td></td><td>14.560 (C+D)</td><td></td></tr><tr><td class="hi">DB III</td><td class="hi">4.492 (A+B)</td><td></td><td class="hi">31.450 (C+D)</td><td></td></tr><tr><td>- UFix</td><td>24.190</td><td></td><td></td><td></td></tr><tr><td class="ok">EBIT neu</td><td class="ok">42.930</td><td></td><td></td><td></td></tr></table></div><div class="tip">Verbesserung: 42.930 − 37.800 = +5.130€ durch Programmoptimierung!</div>
+    </div>
+  </div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">Vertriebscontrolling – CLV</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Rechenaufgabe</span><span class="tag tK">Klausur</span></div>
+      <h3>Aufgabe 5 – CLV Shine-Rösterei berechnen</h3>
+      <div class="prev">Die Shine-Rösterei soll bewertet werden.
+• Jahr 1: Umsatz 100.000€ | Jahr 2: Ums...</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb">
+    <div class="cs">
+      <div class="cs-lbl"><span>❓</span> Aufgabenstellung</div>
+      <div class="ex"><p style="font-size:13px;color:var(--text);line-height:1.6">Die Shine-Rösterei soll bewertet werden.
+• Jahr 1: Umsatz 100.000€ | Jahr 2: Umsatz 200.000€
+• Kosten: 20% vom Umsatz
+• Abwanderungsrate: 10% → Retentionrate R = 90%
+• WACC (Diskontierungszinssatz) i = 10%
+
+Frage 1: Wie hoch ist der CLV für 2 Jahre?
+Frage 2: 2 Pro- und 2 Contra-Argumente zum CLV.</p></div>
+    </div>
+    <div class="cs">
+      <div class="cs-lbl"><span>✅</span> Lösung</div>
+      <div class="cs-lbl"><span>📐</span> Berechnung</div><div class="tw"><table><tr><th></th><th>Jahr 1</th><th>Jahr 2</th></tr><tr><td>Umsatz</td><td>100.000€</td><td>200.000€</td></tr><tr><td>Kosten (20%)</td><td>20.000€</td><td>40.000€</td></tr><tr><td class="hi">Zahlungsüberschuss (EÜ)</td><td class="hi">80.000€</td><td class="hi">160.000€</td></tr><tr><td>Retentionrate R^t</td><td>0,9 (R¹)</td><td>0,81 (R²)</td></tr><tr><td>Diskontierungsfaktor 1/(1+i)^t</td><td>1/1,1 = 0,9091</td><td>1/1,21 = 0,8264</td></tr><tr><td class="ok">Diskont. EÜ × R</td><td class="ok">80.000×0,9091×0,9 = 65.455€</td><td class="ok">160.000×0,8264×0,81 = 107.107€</td></tr></table></div><div class="fm">CLV = 65.455 + 107.107 = <b>172.562€</b></div><div class="cs-lbl" style="margin-top:10px"><span>⚖️</span> Pro & Contra CLV</div><div class="tw"><table><tr><th>Pro (für CLV)</th><th>Contra (gegen CLV)</th></tr><tr><td>Marktnahes Bewertungsmodell</td><td>Unsicherheit zukünftiger Zahlungsströme</td></tr><tr><td>Zukunftsorientiert (nicht nur Vergangenheit)</td><td>Subjektive Bewertung (z.B. Kundenbindungsrate)</td></tr></table></div>
+    </div>
+  </div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">Preise – Elastizitäten & Kalkulation</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Rechenaufgabe</span><span class="tag tK">Klausur</span></div>
+      <h3>Aufgabe 6 – Preiselastizität aus Graphen berechnen</h3>
+      <div class="prev">Aus der Preisabsatz-Funktion ist ablesbar:
+• Preis sinkt von 8€ auf 6€ (ΔP = -2)...</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb">
+    <div class="cs">
+      <div class="cs-lbl"><span>❓</span> Aufgabenstellung</div>
+      <div class="ex"><p style="font-size:13px;color:var(--text);line-height:1.6">Aus der Preisabsatz-Funktion ist ablesbar:
+• Preis sinkt von 8€ auf 6€ (ΔP = -2)
+• Menge steigt von 4 auf 64 (ΔQ = +60)
+
+Fragen:
+1. Berechnen Sie die Preiselastizität.
+2. Um welches Gut handelt es sich (Begründung)?
+3. Wie wirkt sich eine Preisreduktion auf den Umsatz aus?</p></div>
+    </div>
+    <div class="cs">
+      <div class="cs-lbl"><span>✅</span> Lösung</div>
+      <div class="fm">η = (ΔQ / ΔP) × (P_alt / Q_alt)<br>η = (60 / -2) × (8 / 4) = -30 × 2 = <b>-60</b> → |η| = 60<br>Vereinfacht aus Folie: η ≈ 2,81 (andere Lesart der Grafik möglich)</div><div class="tw"><table><tr><th>Frage</th><th>Antwort</th></tr><tr><td>η-Wert</td><td class="wr">Sehr preiselastisch (η >> 1)</td></tr><tr><td>Gut</td><td>Discretionary Spending – z.B. Luxusgut, Urlaub, Entertainment</td></tr><tr><td>Preisreduktion → Umsatz</td><td class="ok">Positiv! Umsatz steigt (η > 1 → Nachfrage steigt überproportional)</td></tr></table></div><div class="tip">Merke: η > 1 (sehr elastisch) → Preissenkung erhöht Umsatz! Güter mit viel Preissensitivität = Luxusgüter, substituierbare Güter.</div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Rechenaufgabe</span><span class="tag tK">Klausur</span></div>
+      <h3>Aufgabe 7 – Angebotskalkulation – Make or Buy GmbH</h3>
+      <div class="prev">Produktion: 150.000 Lampen
+Make-Kosten: Gehäuse 20€ + LED 3€ + Stecker 4€ + Mate...</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb">
+    <div class="cs">
+      <div class="cs-lbl"><span>❓</span> Aufgabenstellung</div>
+      <div class="ex"><p style="font-size:13px;color:var(--text);line-height:1.6">Produktion: 150.000 Lampen
+Make-Kosten: Gehäuse 20€ + LED 3€ + Stecker 4€ + Materialgemeinkosten 810.000€ + var. FK 2,33€/Stk + fix FK 200.000€
+
+Buy-Angebot (ab 100.000): Listenpreis 35,87€ | Rabatt 5% | Skonto 1,5% | Lieferung +2,50€/Stk
+
+Frage: Wie sollte sich die Make or Buy GmbH entscheiden?</p></div>
+    </div>
+    <div class="cs">
+      <div class="cs-lbl"><span>✅</span> Lösung</div>
+      <div class="cs-lbl"><span>📐</span> Make – Kosten pro Stück</div><div class="ex"><p class="st">Material/Stk: 20+3+4 = 27€</p><p class="st">Materialgemeinkosten: 810.000 / 150.000 = 5,40€</p><p class="st">var. Fertigungskosten: 2,33€</p><p class="st">fix FK: 200.000 / 150.000 = 1,33€</p><p class="st">→ Gesamt Make: 27 + 5,40 + 2,33 + 1,33 = <b>36,07€/Stück</b></p></div><div class="cs-lbl" style="margin-top:10px"><span>📐</span> Buy – Einstandspreis</div><div class="ex"><p class="st">Listenpreis: 35,87€</p><p class="st">- Rabatt 5%: -1,79€ → Zielpreis: 34,08€</p><p class="st">- Skonto 1,5%: -0,51€ → Barpreis: 33,57€</p><p class="st">+ Lieferung: +2,50€</p><p class="st">→ Gesamt Buy: <b>36,07€/Stück</b></p></div><div class="tip">Ergebnis: Preislich identisch (beide 36,07€)! Entscheidung nach qualitativen Faktoren.</div><div class="tw"><table><tr><th>Pro Make</th><th>Pro Buy</th></tr><tr><td>"Made in" Marketing nutzen</td><td>Unternehmerisches Risiko sinkt</td></tr><tr><td>Arbeitsplätze erhalten</td><td>Fixkosten (FK fix 200k) wegfallen</td></tr><tr><td>Unabhängigkeit von Lieferant</td><td>Flexibler bei Nachfrageschwankungen</td></tr></table></div>
+    </div>
+  </div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">Risikocontrolling – VaR</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Rechenaufgabe</span><span class="tag tK">Klausur</span></div>
+      <h3>Aufgabe 8 – Value at Risk berechnen (90% Konfidenzniveau)</h3>
+      <div class="prev">Zwei Risikopositionen:
+• Position 1: EW=12%, σ=10%, Gewicht=20%
+• Position 2: EW...</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb">
+    <div class="cs">
+      <div class="cs-lbl"><span>❓</span> Aufgabenstellung</div>
+      <div class="ex"><p style="font-size:13px;color:var(--text);line-height:1.6">Zwei Risikopositionen:
+• Position 1: EW=12%, σ=10%, Gewicht=20%
+• Position 2: EW=6%, σ=30%, Gewicht=80%
+• Kovarianz: -0,019
+• Konfidenzniveau: 90% | Haltedauer: 1 Tag | Volumen: 100.000€
+
+Fragen:
+1. Berechnen Sie den VaR.
+2. Formulieren Sie die VaR-Aussage.
+3. Nennen Sie 3 Möglichkeiten zur Risikobehandlung.</p></div>
+    </div>
+    <div class="cs">
+      <div class="cs-lbl"><span>✅</span> Lösung</div>
+      <div class="cs-lbl"><span>📐</span> Schritt 1: Erwartungswert Portfolio</div><div class="fm">μ_P = 12% × 20% + 6% × 80% = 2,4% + 4,8% = <b>7,2%</b></div><div class="cs-lbl" style="margin-top:10px"><span>📐</span> Schritt 2: Korrelation berechnen</div><div class="fm">ρ = Cov / (σ1 × σ2) = -0,019 / (0,10 × 0,30) = <b>-0,633</b></div><div class="cs-lbl" style="margin-top:10px"><span>📐</span> Schritt 3: Portfolio-Standardabweichung</div><div class="fm">σ_P = √(0,2²×0,1² + 0,8²×0,3² + 2×0,2×0,1×0,8×0,3×(-0,633))<br>= √(0,0004 + 0,0576 + 2×(-0,00304))<br>= √(0,0004 + 0,0576 - 0,00608)<br>= √0,05192 = <b>22,79%</b></div><div class="cs-lbl" style="margin-top:10px"><span>📐</span> Schritt 4: z-Wert (90%)</div><div class="ex"><p class="st">90% Konfidenzniveau → aus Tabelle interpolieren:</p><p class="st">Φ(1,28) = 0,8997 ≈ 90% → z = 1,285</p><p class="st">z_α = <b>-1,285</b> (negativ, Verlustseite!)</p></div><div class="cs-lbl" style="margin-top:10px"><span>📐</span> Schritt 5: VaR</div><div class="fm">VaR = -(7,2% + (-1,285) × 22,79%) × 100.000<br>= -(7,2% - 29,28%) × 100.000<br>= -(-22,08%) × 100.000<br>= <b>22.080€</b> (Folie: ~22.098€)</div><div class="cs-lbl" style="margin-top:10px"><span>💬</span> VaR-Aussage</div><div class="tip">Mit einer Wahrscheinlichkeit von <b>90%</b> wird der Verlust der Risikoposition innerhalb eines <b>Tages</b> den Betrag von <b>22.080€</b> nicht überschreiten.</div><div class="cs-lbl" style="margin-top:10px"><span>🛡️</span> 3 Risikobehandlungsmöglichkeiten</div><div class="ex"><p class="st">1. Risikoakzeptanz – Risiko bewusst tragen (Chance vs. Verlust abwägen)</p><p class="st">2. Risikobegrenzung/Hedging – Derivate, Diversifikation (neg. Korrelation nutzen!)</p><p class="st">3. Risikovermeidung – Position verkaufen / aus Markt aussteigen</p></div>
+    </div>
+  </div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">Digital Controlling</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag ti">Wahr/Falsch</span><span class="tag tK">Klausur</span></div>
+      <h3>Aufgabe 9 – Wahr oder Falsch – Digital Controlling</h3>
+      <div class="prev">1. Warenkorb-Analysen sind klassische Assoziationsanalysen.
+2. Reihenfolge der K...</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb">
+    <div class="cs">
+      <div class="cs-lbl"><span>❓</span> Aufgabenstellung</div>
+      <div class="ex"><p style="font-size:13px;color:var(--text);line-height:1.6">1. Warenkorb-Analysen sind klassische Assoziationsanalysen.
+2. Reihenfolge der Knoten bei Decision Trees basiert oft auf Attributs-Korrelation.
+3. Entscheidungsbäume gehören zur Gruppe der Klassifikationen.
+4. Clusteranalysen bilden homogene Gruppen, die untereinander heterogen sind.
+5. Business Intelligence = IT-gestützte Datenaufbereitung mit Unternehmensbezug.
+6. Neuronale Netze bestehen aus Input-Layer, mindestens einem Hidden-Layer und Output-Layer.</p></div>
+    </div>
+    <div class="cs">
+      <div class="cs-lbl"><span>✅</span> Lösung</div>
+      <div class="tw"><table><tr><th>Nr.</th><th>Aussage (kurz)</th><th>Antwort</th><th>Hinweis</th></tr><tr><td>1</td><td>Warenkorb = Assoziationsanalyse</td><td class="ok">WAHR</td><td>Klassisches Anwendungsbeispiel: {Brot, Milch} → Support, Konfidenz, Lift</td></tr><tr><td>2</td><td>Knoten-Reihenfolge = Attributs-Korrelation</td><td class="wr">FALSCH</td><td>Reihenfolge basiert auf <b>Information Gain</b> (höchster IG → erster Split)!</td></tr><tr><td>3</td><td>Entscheidungsbäume = Klassifikation</td><td class="ok">WAHR</td><td>Decision Trees sind überwachtes Lernen → Klassifikation</td></tr><tr><td>4</td><td>Cluster: intern homogen, untereinander heterogen</td><td class="ok">WAHR</td><td>Definition Cluster-Analyse: max. Homogenität intra-cluster, max. Heterogenität inter-cluster</td></tr><tr><td>5</td><td>BI = IT-gestützte Unternehmensdata</td><td class="ok">WAHR</td><td>Business Intelligence: Datenaufbereitung + Analyse mit Unternehmensbezug</td></tr><tr><td>6</td><td>NN = Input + Hidden + Output Layer</td><td class="ok">WAHR</td><td>Mindestens 1 Hidden Layer. Hidden = Black Box!</td></tr></table></div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag td">Wissensfrage</span><span class="tag tK">Klausur</span></div>
+      <h3>Aufgabe 10 – 4 Analytics-Typen beschriften</h3>
+      <div class="prev">Beschriften Sie die 4 Analytics-Stufen:
+• "What happened?" → ?
+• "Why did it hap...</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb">
+    <div class="cs">
+      <div class="cs-lbl"><span>❓</span> Aufgabenstellung</div>
+      <div class="ex"><p style="font-size:13px;color:var(--text);line-height:1.6">Beschriften Sie die 4 Analytics-Stufen:
+• "What happened?" → ?
+• "Why did it happen?" → ?
+• "What will happen?" → ?
+• "How can we make it happen?" → ?</p></div>
+    </div>
+    <div class="cs">
+      <div class="cs-lbl"><span>✅</span> Lösung</div>
+      <div class="tw"><table><tr><th>Frage</th><th>Analytics-Typ</th><th>Beschreibung</th></tr><tr><td>What happened?</td><td class="hi">Descriptive Analytics</td><td>Rückblickende Beschreibung (was ist passiert?)</td></tr><tr><td>Why did it happen?</td><td class="hi">Diagnostic Analytics</td><td>Ursachenanalyse (warum ist es passiert?)</td></tr><tr><td>What will happen?</td><td class="hi">Predictive Analytics</td><td>Vorhersage (was wird passieren?)</td></tr><tr><td>How can we make it happen?</td><td class="hi">Prescriptive Analytics</td><td>Handlungsempfehlung (was sollen wir tun?)</td></tr></table></div><div class="tip">Die 4 Stufen bauen aufeinander auf: Descriptive → Diagnostic → Predictive → Prescriptive. Predictive Analytics ist das Kernthema aus der Vorlesung!</div>
+    </div>
+  </div>
+</div>
+<div class="sdiv"><div class="sline"></div><div class="stxt">Bilanzanalyse – Kennzahlen</div><div class="sline"></div></div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Rechenaufgabe</span><span class="tag tK">Klausur</span></div>
+      <h3>Aufgabe 11 – Cash Conversion Cycle, Working Capital, Anlageintensität, Anlagendeckungsgrad 2</h3>
+      <div class="prev">Gegeben: Bilanz mit Anlagevermögen=100.000€, Umlaufvermögen=200.000€ (davon Vorr...</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb">
+    <div class="cs">
+      <div class="cs-lbl"><span>❓</span> Aufgabenstellung</div>
+      <div class="ex"><p style="font-size:13px;color:var(--text);line-height:1.6">Gegeben: Bilanz mit Anlagevermögen=100.000€, Umlaufvermögen=200.000€ (davon Vorräte=30.000€, Forderungen=50.000€, flüssige Mittel=120.000€), Eigenkapital=200.000€, LFV=70.000€, kurzfr. Verbindlichkeiten=30.000€, Verb. L&L=15.000€
+GuV: Umsatz=150.000€, Herstellungskosten=110.000€, Umsatzkosten=135.000€
+
+Berechnen Sie CCC, Working Capital, Anlageintensität und Anlagendeckungsgrad 2.</p></div>
+    </div>
+    <div class="cs">
+      <div class="cs-lbl"><span>✅</span> Lösung</div>
+      <div class="cs-lbl"><span>📐</span> Cash Conversion Cycle</div><div class="fm">DSO = Forderungen / Umsatz × 360 = 50.000 / 150.000 × 360 = <b>120 Tage</b><br>DIO = Vorräte / Herstellungskosten × 360 = 30.000 / 110.000 × 360 = <b>98,18 Tage</b><br>DPO = Verb. L&L / Umsatzkosten × 360 = 15.000 / 135.000 × 360 = <b>40 Tage</b><br>CCC = DSO + DIO − DPO = 120 + 98,18 − 40 = <b>178,18 Tage</b></div><div class="tip">CCC = Zeit zwischen Cash-Outflow für Inventar und Cash-Inflow durch Verkauf. Je niedriger, desto besser!</div><div class="cs-lbl" style="margin-top:10px"><span>📐</span> Working Capital</div><div class="fm">Working Capital = Umlaufvermögen − kurzfristige Verbindlichkeiten<br>= 200.000 − 30.000 = <b>170.000€</b></div><div class="tip">Working Capital > 0 = kurzfristige Verbindlichkeiten durch UV gedeckt. Positiv!</div><div class="cs-lbl" style="margin-top:10px"><span>📐</span> Anlageintensität</div><div class="fm">Anlageintensität = Anlagevermögen / Gesamtvermögen<br>= 100.000 / 300.000 = <b>33,33%</b></div><div class="tip">Niedrige Anlageintensität (33%) = flexibles Unternehmen (weniger gebundenes Kapital). Industrie typisch höher.</div><div class="cs-lbl" style="margin-top:10px"><span>📐</span> Anlagendeckungsgrad 2</div><div class="fm">ADG 2 = (Eigenkapital + LFV) / Anlagevermögen<br>= (200.000 + 70.000) / 100.000 = <b>2,7</b></div><div class="tip">ADG 2 > 1 = Anlagevermögen durch langfristiges Kapital gedeckt. 2,7 = sehr gut! Goldene Bilanzregel erfüllt.</div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="ch" onclick="toggle(this)">
+    <div class="chl">
+      <div class="ctags"><span class="tag tf">Rechenaufgabe</span><span class="tag tK">Klausur</span></div>
+      <h3>Aufgabe 12 – EBIT, EBITDA, EBIT-Marge, ROI berechnen</h3>
+      <div class="prev">Gegeben (in Tausend €):
+• Jahresüberschuss: 1.051
+• Steuern: 256
+• Zinsaufwand: ...</div>
+    </div>
+    <span class="chv">▼</span>
+  </div>
+  <div class="cb">
+    <div class="cs">
+      <div class="cs-lbl"><span>❓</span> Aufgabenstellung</div>
+      <div class="ex"><p style="font-size:13px;color:var(--text);line-height:1.6">Gegeben (in Tausend €):
+• Jahresüberschuss: 1.051
+• Steuern: 256
+• Zinsaufwand: 55
+• Sonstiges Finanzergebnis: 43
+• Abschreibungen: 842
+• Umsatz: 11.589
+• Gesamtvermögen: 37.867
+
+Berechnen Sie: EBIT, EBITDA, EBIT-Marge, ROI</p></div>
+    </div>
+    <div class="cs">
+      <div class="cs-lbl"><span>✅</span> Lösung</div>
+      <div class="cs-lbl"><span>📐</span> Berechnung</div><div class="fm">EBIT = JÜ + Steuern + Zinsen + Sonstiges<br>= 1.051 + 256 + 55 + 43 = <b>1.405 T€</b></div><div class="fm">EBITDA = EBIT + Abschreibungen<br>= 1.405 + 842 = <b>2.247 T€</b></div><div class="fm">EBIT-Marge = EBIT / Umsatz<br>= 1.405 / 11.589 = <b>12,12%</b></div><div class="fm">ROI = EBIT / Gesamtvermögen<br>= 1.405 / 37.867 = <b>3,71%</b></div><div class="tw"><table><tr><th>Kennzahl</th><th>Formel</th><th>Bedeutung</th></tr><tr><td>EBIT</td><td>JÜ + Steuern + Zinsen</td><td>Ergebnis vor Zinsen und Steuern</td></tr><tr><td>EBITDA</td><td>EBIT + Abschreibungen</td><td>Operatives Ergebnis vor Abschreibungen</td></tr><tr><td>EBIT-Marge</td><td>EBIT / Umsatz</td><td>Anteil EBIT am Umsatz – Rentabilität</td></tr><tr><td>ROI</td><td>EBIT / Gesamtvermögen</td><td>Kapitalrendite – Effizienz des eingesetzten Kapitals</td></tr></table></div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="view" id="view-quiz">
+<div class="mhd"><div class="mhd-icon">🎯</div><div><h2>Quiz</h2><p>40 Fragen · Falsche kommen wieder · Auswertung nach Modul</p></div></div>
+<div class="qmode">
+  <button class="qmb active" onclick="setMode('all',this)">Alle</button>
+  <button class="qmb" onclick="setMode('allg',this)">Allg.</button>
+  <button class="qmb" onclick="setMode('vtrieb',this)">Vertrieb</button>
+  <button class="qmb" onclick="setMode('prod',this)">Produktion</button>
+  <button class="qmb" onclick="setMode('risiko',this)">Risiko</button>
+  <button class="qmb" onclick="setMode('digital',this)">Digital</button>
+</div>
+<div id="qcont"></div>
+</div>
+</div></div>
+<script>
+const Q=[
+{m:'allg',q:"Was sind die 3 Kernelemente in Horvaths Controlling-Definition?",o:['Planung, Steuerung, Liquidität','Kosten, Erlöse, Budgets','Planung, Kontrolle, Informationsversorgung','Steuerung, Benchmarking, Reporting'],c:2,f:"Horvath: Koordination von Planung, Kontrolle und Informationsversorgung – ergebniszielorientiert, systembildend und systemkoppelnd."},
+{m:'allg',q:"Was bedeutet systemkoppelnd im Controlling?",o:['Neue IT-Systeme und Tools einführen','Buchführung laufend digitalisieren','Externe Berater einbinden','Laufende Abstimmung bestehender Teilsysteme (z.B. Infofluss aus dem RW)'],c:3,f:"Systemkoppelnd = laufende Abstimmung bestehender Teilsysteme. Systembildend = neue Teilsysteme aufbauen (z.B. Berichtswesen)."},
+{m:'allg',q:"Controller = Navigator, Manager = Pilot. Was ist Aufgabe des Controllers?",o:['Selbst entscheiden und Ergebnis verantworten','Ergebnistransparenz sichern und Entscheidungen vorbereiten','Buchführung prüfen und korrigieren','Liquidität des Unternehmens sichern'],c:1,f:"Manager = Ergebnisverantwortung. Controller = Ergebnistransparenz. Der Controller liefert die Entscheidungsgrundlage, der Manager entscheidet."},
+{m:'allg',q:"Welcher Bereich des Unternehmens ist der sogenannte Buchführer?",o:['Controlling (ergebniszielorientiert)','Treasury (Liquiditätssicherung)','Rechnungswesen (Vergangenheit, HGB/IFRS)','Interne Revision (Normenprüfung)'],c:2,f:"Rechnungswesen = Buchführer. Controlling = Navigator. Treasury = Schatzmeister. Interne Revision = Unternehmenspolizei."},
+{m:'allg',q:"Wann entstand die erste bekannte Unternehmens-Controllerstelle?",o:['1945 bei General Electric USA','1863 im US-Bankenwesen','1778 im US-Staatsapparat','1880 bei einer US-Eisenbahngesellschaft'],c:3,f:"1880 bei der Atchison, Topeka & Santa Fe Railway. GE folgte als erstes bekanntes Unternehmen in den 1890ern."},
+{m:'allg',q:"Welche Reihenfolge beschreibt den Controlling-Zyklus korrekt?",o:['Kontrolle → Steuerung → Planung → Kontrolle','Budgetierung → Analyse → Reporting → Reset','Steuerung → Planung → Kontrolle → Steuerung','Planung → Kontrolle (Soll-Ist) → Steuerung → Planung'],c:3,f:"Controlling-Zyklus: Planung (Ziele setzen) → Kontrolle (Soll-Ist-Vergleich) → Steuerung (Massnahmen) → zurück zur Planung. Kontinuierlicher Kreislauf!"},
+{m:'allg',q:"Welches Motto beschreibt das OPERATIVE Controlling am besten?",o:['Richtige Dinge tun – Effektivität','Langfristige Erfolgspotentiale sichern','Dinge richtig tun – Effizienz','Externe Chancen identifizieren und nutzen'],c:2,f:"Operatives Controlling: 1-3 Jahre, Wirtschaftlichkeit, Effizienz (Dinge RICHTIG tun), intern, quantitativ. Strategisch: Effektivität (RICHTIGE Dinge tun), 5-10 Jahre."},
+{m:'allg',q:"Welches Instrument gehört zum STRATEGISCHEN Controlling?",o:['Deckungsbeitragsrechnung','Soll-Ist-Vergleich','Balanced Scorecard','ABC-Analyse'],c:2,f:"Balanced Scorecard ist strategisch. Ebenso SWOT, BCG-Portfolio, Cluster-Analyse. Operativ: DB-Rechnung, Soll-Ist, ABC-Analyse, Break-Even."},
+{m:'allg',q:"SWOT-Strategie bei Stärken + Risiken (S+T)?",o:['Ausbauen – Chancen durch Stärken nutzen','Aufholen – Schwächen durch Chancen ausgleichen','Absichern – Stärken gegen Risiken einsetzen','Vermeiden – defensive Haltung einnehmen'],c:2,f:"S+T = Absichern. S+O = Ausbauen (beste Kombi). W+O = Aufholen. W+T = Vermeiden (schlechteste Kombi)."},
+{m:'allg',q:"Welcher NACHTEIL gehört zur SWOT-Analyse?",o:['Zu kostspielig in der Anwendung','Nur für Großunternehmen geeignet','Berücksichtigt keine internen Faktoren','Qualitativ und subjektiv – Gefahr nachträglicher Rationalisierung'],c:3,f:"SWOT-Nachteile: qualitativ, subjektiv, keine klaren nächsten Schritte, Gefahr der nachträglichen Rationalisierung (Entscheidung wird im Nachhinein gerechtfertigt)."},
+{m:'allg',q:"Produkt hat negatives DB I. Was ist zu tun?",o:['Erzeugnisfixkosten senken und weiterführen','Preis anheben bis DB II positiv wird','Produkt grundsätzlich eliminieren – aber Interdependenzen prüfen!','Gruppenfixkosten auf andere Produkte umlagern'],c:2,f:"Negatives DB I: Produkt deckt nicht einmal variable Kosten. Grundsätzlich eliminieren. Aber: Interdependenzen prüfen! (z.B. Drucker ohne Tinte verliert Wert)"},
+{m:'vtrieb',q:"Was beschreibt der Vertrieb laut Nischlag (funktionaler Sinn)?",o:['Die buchhalterische Erfassung aller Verkaufsvorgänge','Die Planung des Produktionsprogramms für Nachfrager','Inbegriff der Maßnahmen um Leistungen in den Verfügungsbereich der Nachfrager zu bringen','Die Koordination von Einkauf und Absatz im Unternehmen'],c:2,f:"Nischlag: Vertrieb = Inbegriff der Maßnahmen um Leistungen in den Verfügungsbereich der Nachfrager zu bringen. Aufgaben: organisatorisch, akquisitorisch, logistisch."},
+{m:'vtrieb',q:"Welche Klasse hat bei der ABC-Analyse 70-80% des Gesamtwertes?",o:['D-Klasse (strategische Kunden)','C-Klasse (Massenkunden, ~50%)','B-Klasse (mittlere Bedeutung, ~30%)','A-Klasse (Schlüsselkunden, ~20%)'],c:3,f:"A-Klasse: 70-80% des Wertes (~20% der Kunden). B: 10-20%. C: 5-10% (~50% der Kunden). Pareto: 20% der Kunden → 80% des Umsatzes."},
+{m:'vtrieb',q:"Was passiert in Schritt 5 der 7-schrittigen ABC-Analyse?",o:['Fragestellung und Merkmale definieren','Grenzwerte für A/B/C festsetzen','Handlungsempfehlungen ableiten','Kumulierten Ergebnisbeitrag in Prozent ermitteln'],c:3,f:"7 Schritte: 1.Fragestellung, 2.Kalkulation, 3.Sortieren (absteigend), 4.Kumulieren, 5.Kumulierten Ergebnisbeitrag in % ermitteln, 6.Grenzwerte, 7.Grafik + Empfehlungen."},
+{m:'vtrieb',q:"BCG-Matrix: Welche Strategie gilt für Cash Cows?",o:['Aggressiv investieren und Marktanteile ausbauen','Selektiv vorgehen und nur beste Produkte halten','Abschöpfen – hoher Cashflow finanziert Stars und Question Marks','Desinvestieren wegen niedrigem Marktanteil'],c:2,f:"Cash Cows: hoher rel. Marktanteil, niedriges Marktwachstum, hoher positiver CF → Abschöpfen! Dieser CF finanziert Question Marks und Stars."},
+{m:'vtrieb',q:"Welche Phase des Kundenlebenszyklus ist effizienter als Neuakquise?",o:['Phase 1 – Awareness (Aufmerksamkeit wecken)','Phase 2 – Acquisition (Kunden gewinnen)','Phase 3 – Conversion (Erstkauf abschließen)','Phase 4 – Retention (Kunden binden)'],c:3,f:"Retention = Kundenbindung ist effizienter als Neuakquise! Bestehenden Kunden halten kostet weniger. Deshalb: Churn Rate minimieren, Up-/Cross-Selling nutzen."},
+{m:'vtrieb',q:"Was misst der Customer Lifetime Value (CLV)?",o:['Den kumulierten Jahresumsatz eines Kunden','Den durchschnittlichen Bestellwert pro Transaktion','Den Barwert aller gegenwärtigen und zukünftigen Zahlungsströme einer Kundenbeziehung','Den aktuellen Kundenwert basierend auf Vorjahresdaten'],c:2,f:"CLV = Barwert aller gegenw. UND zukünftigen Zahlungsströme. Zukunftsorientiert! Weiterentwicklung der Kunden-DB-Rechnung. Zeigt ob Invest in Kundenbeziehung sich lohnt."},
+{m:'vtrieb',q:"Was beschreibt die Retentionrate R im CLV-Modell?",o:['Der Diskontierungszinssatz für zukünftige Cashflows','Die jährliche Wachstumsrate des Kundenumsatzes','Die Wahrscheinlichkeit, dass ein Kunde bleibt – multipliziert sich jährlich','Die einmaligen Akquisitionskosten bei Vertragsabschluss'],c:2,f:"R = Retentionrate = Wahrscheinlichkeit dass Kunde bleibt. Multipliziert sich: 0,9 × 0,9 × 0,9... Höhere Kundenbindung = deutlich höherer CLV!"},
+{m:'vtrieb',q:"Welche WACC-Formel ist korrekt?",o:['WACC = Umsatzrendite × Kapitalumschlag','WACC = i_EK × (EK/GK) + i_FK × (FK/GK) × (1-T)','WACC = (EK + FK) / Gesamtkapital','WACC = Eigenkapitalrendite / Fremdkapitalrendite'],c:1,f:"WACC = i_EK × (EK/GK) + i_FK × (FK/GK) × (1-T). Mischzinssatz aus EK- und FK-Kosten, gewichtet am Gesamtkapital, nach Steuer. Wird als Diskontierungszinssatz i im CLV verwendet."},
+{m:'vtrieb',q:"BCG-Matrix: Was gilt für Question Marks?",o:['Abschöpfen – hoher CF, niedriges Wachstum','Investieren – hoher Marktanteil, viel Wachstum','Selektion – niedriger Marktanteil, hohes Wachstum, neg. CF','Desinvestieren – niedriger Marktanteil, niedriges Wachstum'],c:2,f:"Question Marks: niedriger rel. Marktanteil, hohes Marktwachstum, negativer CF → Selektion! Nur vielversprechende Question Marks zu Stars entwickeln, andere desinvestieren."},
+{m:'vtrieb',q:"Kunden-Scoring: Was ist ein zentraler Nachteil?",o:['Zu aufwändig für kleine Unternehmen','Nur quantitative Faktoren berücksichtigbar','Subjektive Gewichtungen – Manipulationspotenzial!','Keine Vergleichbarkeit zwischen Kunden möglich'],c:2,f:"Hauptnachteil Scoring: subjektive Gewichtungen → Manipulation möglich (Entscheidung wird nachträglich gerechtfertigt). Beste Alternative evtl. nicht berücksichtigt."},
+{m:'prod',q:"Was ist der relative Deckungsbeitrag bei Engpässen?",o:['Deckungsbeitrag multipliziert mit dem Umsatzanteil','Deckungsbeitrag minus alle Fixkostenbestandteile','Umsatz dividiert durch die variablen Stückkosten','Deckungsbeitrag pro Stück dividiert durch Fertigungszeit pro Stück'],c:3,f:"Relativer DB = DB/Stück ÷ Fertigungszeit/Stück. Bei Engpässen IMMER relativen DB maximieren, nicht absoluten DB! Höchster rel. DB = Rang 1 im Programm."},
+{m:'prod',q:"Programmplanung Schritt 2: Welche Produkte werden eliminiert?",o:['Produkte mit dem niedrigsten absoluten Deckungsbeitrag','Produkte mit dem höchsten Fertigungszeitbedarf','Produkte mit positivem DB I aber negativem DB II','Produkte mit negativem Stück-DB (aber Interdependenzen prüfen!)'],c:3,f:"Schritt 2: Alle Produkte mit negativem Stück-DB eliminieren. Interdependenzen prüfen! (Drucker ohne Tinte wäre wertlos – Drucker trotzdem im Programm halten)"},
+{m:'prod',q:"Wie lautet die Break-Even-Formel für ein Produkt?",o:['BE = variable Kosten / Fixkosten','BE = Fixkosten × Stückdeckungsbeitrag','BE = Umsatz / (Preis − Fixkosten)','BE = Fixkosten / (Preis − variable Stückkosten)'],c:3,f:"BE-Menge = kf / (p-kv) = Fixkosten / Stück-DB. Bei dieser Menge gilt: Umsatz = Gesamtkosten = Gewinn 0."},
+{m:'prod',q:"BE-Umsatz bei mehreren Produkten – welche Formel ist korrekt?",o:['Summe aller Einzel-BE-Mengen mal Preise','Fixkosten dividiert durch gewichtete Deckungsbeitragsrate','Fixkosten multipliziert mit Anzahl der Produkte','Durchschnittspreis mal Gesamt-BE-Menge'],c:1,f:"BE-Umsatz = Fixkosten / gewichtete DB-Rate. Gewichtete DB-Rate = Σ (DB-Rate × Umsatzanteil je Produkt). DB-Rate = DB/Preis."},
+{m:'prod',q:"Angebotskalkulation – welche Reihenfolge (aufwärts) ist korrekt?",o:['Gewinn → Barpreis → Skonto → Zielpreis → Rabatt → Listenpreis','Einstandspreis → Handlungskosten → Selbstkosten → Gewinn → Barpreis → Skonto → Zielpreis → Rabatt → Listenpreis','Listenpreis → Rabatt → Zielpreis → Skonto → Barpreis → Gewinn → Selbstkosten','Selbstkosten → Rabatt → Skonto → Barpreis → Listenpreis'],c:1,f:"Vorwärtskalkulation: Einstandspreis + Handlungskosten = Selbstkosten + Gewinn = Barpreis + Skonto = Zielpreis + Rabatt = Listenpreis (UVP)."},
+{m:'prod',q:"Preiselastizität η = 2,5: Was passiert bei einer Preiserhöhung?",o:['Nachfrage steigt proportional zur Preiserhöhung','Umsatz steigt, da Nachfrage unelastisch reagiert','Nachfrage bleibt konstant – vollkommen unelastisch','Nachfrage sinkt überproportional – Umsatz sinkt!'],c:3,f:"η > 1 = sehr elastisch. Preiserhöhung 1% → Nachfrage sinkt > 1% → Umsatz sinkt! Bei η < 1 (unelastisch): Preiserhöhung → Umsatz steigt."},
+{m:'prod',q:"DB II ist positiv, EBIT ist negativ. Was bedeutet das?",o:['Erzeugnisfixkosten wurden falsch berechnet','Variable Kosten übersteigen die Umsatzerlöse','DB II ist zu gering um Gruppen- oder Unternehmensfixkosten zu decken','Produkt ist profitabel – EBIT-Berechnung prüfen'],c:2,f:"Pos. DB II deckt var. Kosten + Erzeugnisfixkosten. Aber: wenn DB II < Gruppenfixkosten → DB III negativ → EBIT negativ. Immer alle Stufen prüfen!"},
+{m:'prod',q:"Kurzfristige Preisuntergrenze bedeutet?",o:['Preis muss alle Fixkosten decken','Preis muss mindestens die variablen Kosten decken (DB ≥ 0)','Preis entspricht dem Wettbewerbspreis','Preis wird vom Kunden als Maximum akzeptiert'],c:1,f:"Kurzfristige PUG = variable Kosten decken (DB ≥ 0). Langfristige PUG = alle Kosten decken (var. + fix). Unter kurzfristiger PUG: sofortiger Verlust pro Stück!"},
+{m:'risiko',q:"Was ist die korrekte Reihenfolge des Risikocontrolling-Zyklus?",o:['Steuerung → Identifikation → Bewertung → Kontrolle','Kontrolle → Bewertung → Identifikation → Steuerung','Identifikation → Bewertung → Steuerung → Kontrolle','Bewertung → Steuerung → Kontrolle → Identifikation'],c:2,f:"1.Identifikation (qualitativ – welche Risiken?) → 2.Bewertung (wie wahrscheinlich, wie groß?) → 3.Steuerung (wie reagieren?) → 4.Kontrolle. Kontinuierlicher Kreislauf!"},
+{m:'risiko',q:"Was kombiniert die Risk Map zur Risikopriorisierung?",o:['Varianz und Erwartungswert der Risikoposition','Eintrittswahrscheinlichkeit und Schadenshöhe (mit Iso-Linien)','Kovarianz und Korrelation der Risikofaktoren','Monatliche Umsatzabweichungen und Fixkosten'],c:1,f:"Risk Map = Eintrittswahrscheinlichkeit × Schadenshöhe. Iso-Linien verbinden gleiche Risikokombinationen. Basis für Priorisierung der Risikosteuerung."},
+{m:'risiko',q:"Risikoüberwälzung bedeutet?",o:['Risikotragfähigkeit intern auf alle Abteilungen aufteilen','Risiko durch Ausstieg aus dem Markt komplett beseitigen','Eintrittswahrscheinlichkeit durch Prävention und Schulungen senken','Finanzielle Wirkung auf Dritte übertragen (Versicherungen, Derivate)'],c:3,f:"Risikoüberwälzung: Finanzielle Wirkung auf Dritte übertragen. Instrumente: Versicherungsverträge, Finanzderivate, Vertragsbedingungen mit Kunden/Lieferanten."},
+{m:'risiko',q:"Kerze: μ=40h, σ=7h. Wie hoch ist P(Kerze brennt bis 47h)?",o:['72% – weil 47h näher an μ liegt als σ','68% – entspricht ±1σ Intervall','84% – Standardnormalverteilung Φ(1)=0,84','95% – entspricht ±1,645σ Intervall'],c:2,f:"z = (47-40)/7 = 1. Aus Standardnormalverteilungstabelle: Φ(1) = 0,84 = 84%. Merke: z=1→84%, z=1,645→95%."},
+{m:'risiko',q:"Welchen z-Wert verwendet man für ein 95%-Konfidenzniveau im VaR?",o:['z = +2,33 (positive rechte Seite)','z = +1,645 (positive Normalverteilung)','z = 0 (Erwartungswert)','z = -1,645 (negative linke Verlustseite)'],c:3,f:"z_α = -1,645 bei 95% Konfidenzniveau. NEGATIV, weil die linke Verlustseite (die schlechtesten 5%) berechnet wird. Interpolation: (1,64+1,65)/2 = 1,645."},
+{m:'risiko',q:"VaR = 1.630€ bei 95% und 1 Tag Haltedauer – was besagt das?",o:['Der tatsächliche Verlust beträgt exakt 1.630€','Mit 5% Wahrscheinlichkeit verliert man den gesamten Portfoliowert','Der Erwartungswert der Risikoposition liegt bei 1.630€','Mit 95% Wahrscheinlichkeit übersteigt der Tagesverlust 1.630€ nicht'],c:3,f:"VaR-Aussage: Mit X% Wahrscheinlichkeit und Haltedauer Y übersteigt der Verlust Z nicht. Die restlichen 5% (Black Swan) sind NICHT abgedeckt!"},
+{m:'risiko',q:"Portfolio-Standardabweichung bei 2 Positionen – welche Formel stimmt?",o:['σ_P = σ1 + σ2 (additive Formel)','σ_P = (σ1 × x1 + σ2 × x2) / 2','σ_P = √(x1²×σ1² + x2²×σ2² + 2×x1×x2×σ1×σ2×ρ)','σ_P = Kovarianz(σ1, σ2) × Korrelation'],c:2,f:"σ_P = √(x1²σ1² + x2²σ2² + 2x1x2σ1σ2ρ). Negative Korrelation (ρ<0) reduziert das Portfolio-Risiko durch Diversifikation!"},
+{m:'risiko',q:"Wo liegt die Hauptgrenze des Value at Risk?",o:['VaR lässt sich nur für Aktienportfolios berechnen','VaR setzt voraus, dass alle Positionen identisch korreliert sind','VaR zeigt nur die Verlustgrenze – nicht die Schadenshöhe bei Black-Swan-Ereignissen','VaR ist zu komplex für den praktischen Unternehmenseinsatz'],c:2,f:"VaR-Grenzen: Beschreibt nur Grenze, nicht Schadenshöhe bei Black Swan. Normalverteilungs-Annahme (Realität?). Periodizität (Truthahn-Syndrom). Lösung: Kennzahlensystem + Szenarioanalysen."},
+{m:'risiko',q:"Kovarianz Cov=0,0644, σ1=0,44, σ2=0,28 – wie lautet die Korrelation?",o:['ρ = 0,0644 × (0,44 + 0,28) = 0,046','ρ = 0,0644 / (0,44 × 0,28) = 0,53','ρ = (0,44 + 0,28) / 0,0644 = 11,18','ρ = 0,0644 × 0,44 × 0,28 = 0,0079'],c:1,f:"ρ = Cov / (σ1 × σ2) = 0,0644 / (0,44 × 0,28) = 0,53 → positiv korreliert. Bei ρ < 0 besteht Diversifikationspotenzial im Portfolio!"},
+{m:'digital',q:"Was ist Predictive Analytics?",o:['Rückblickende Auswertung historischer Unternehmenskennzahlen','Erstellung standardisierter Berichte für die Unternehmensführung','Verwendung math.-stat. Verfahren + Data Mining um Muster aus BigData zu erkennen','Buchhalterische Verarbeitung von Massendaten aus ERP-Systemen'],c:2,f:"Predictive Analytics = math.-stat. Verfahren + Data-Mining-Algorithmen um Muster aus großen Datenmengen zu erkennen. Basis für automatisierte Prognosen."},
+{m:'digital',q:"Was ist charakteristisch für überwachtes maschinelles Lernen?",o:['Unbeschriftete Daten, Output ist vorab unbekannt','Viele Layer verarbeiten komplexe Datensätze (Deep Learning)','Beschriftete (gelabelte) Daten, Output ist vorgegeben','Clusterbildung ohne vorherige Klassendefinition'],c:2,f:"Überwachtes Lernen: beschriftete Daten, Output vorgegeben (z.B. Kreditentscheidung: Ja/Nein). Unüberwachtes: unbeschriftet (Clustering). Deep Learning: viele Layer."},
+{m:'digital',q:"Assoziationsanalyse: Was bedeutet Lift > 1?",o:['Das Item-Set kommt sehr selten in Transaktionen vor','Der Support liegt unter dem Mindestschwellwert','Kein statistischer Zusammenhang zwischen X und Y','Erhöhte Wahrscheinlichkeit Y zu kaufen wenn X schon gewählt – statistisch relevant!'],c:3,f:"Lift = Konfidenz / P(Y). Lift > 1: erhöhte Wahrscheinlichkeit Y zu kaufen wenn X gewählt. Lift = 1: unabhängig. Lift < 1: negativer Zusammenhang."},
+{m:'digital',q:"Wie funktioniert K-Means (partitionierendes Clusterverfahren)?",o:['Bottom-Up: jedes Objekt startet als eigener Cluster, dann zusammenführen','Top-Down: alle Objekte in einem Cluster, dann aufteilen','Nur überwachtes Verfahren – Klassen vorab definieren','K vorgegeben → Mittelwerte als Zentrum → Objekte nächstem Cluster → iterativ'],c:3,f:"K-Means: 1.Anzahl K vorgeben, 2.Clusterzentrum = Mittelwert, 3.Objekte dem nächsten Cluster zuordnen (euklidische Distanz), 4.Wiederholen bis keine Verbesserung."},
+{m:'digital',q:"Information Gain beim Decision Tree – was drückt er aus?",o:['Gewinn durch Weiterverkauf von Kundendaten an Dritte','Die Tiefe des Entscheidungsbaums nach dem Split','Anzahl korrekt klassifizierter Datensätze nach Training','Entropie_gesamt minus Entropie_Attribut – je höher, desto besserer Split'],c:3,f:"Information Gain = Entropie_gesamt - Entropie_Attribut. Je höher der IG, desto besser der Split. Attribut mit höchstem IG wird zuerst gesplittet."},
+{m:'digital',q:"Welche Schicht des Neuronalen Netzes wird als Black Box bezeichnet?",o:['Input Layer – empfängt externe Daten','Output Layer – gibt finales Ergebnis aus','Aktivierungsfunktion – steuert Gewichtungen','Hidden Layer(s) – mehrstufige Entscheidung, nicht transparent'],c:3,f:"Hidden Layer(s) treffen Entscheidungen in mehrstufigem Prozess. Als Black Box bezeichnet, weil die Entscheidungsgrundlage nicht transparent ist – Problem für Compliance!"},
+{m:'digital',q:"Welche der 4 digitalen Wellen (PWC) ist die aktuell fortgeschrittenste?",o:['Controlling als Datensammler und Datenbankpfleger','Controlling als Datenanalyst und Reportingspezialist','Controlling als Managementberatung und Sparringspartner','Controlling als strategisches Instrument mit AI-gestützten Prognosen'],c:3,f:"4 Wellen: 1.Datensammler → 2.Datenanalyst → 3.Managementberatung → 4.Strategisches Instrument. Letzteres ist das angestrebte Ziel des Digital Controllings."},
+{m:'digital',q:"Was ist eine kritische Grenze der AI-Nutzung im Controlling?",o:['AI arbeitet immer zu langsam für operative Entscheidungen','AI kann keine Tabellendaten verarbeiten, nur Bilder und Text','AI-Systeme setzen immer Internetzugang voraus','KI-Halluzinationen + Black Box-Entscheidungen + hohe Energie- und Labelingkosten'],c:3,f:"Kritische Aspekte: KI-Halluzinationen (falsche Antworten mit hoher Konfidenz), Black Box (Compliance!), hohe Kosten (Labeling, Energie, Wasser), Datenmanipulationsrisiko."}
+];
+
+let mode='all',qs=[],qi=0,answered=false,wrongs=[],ts={};
+
+function toggle(h){
+  const cb=h.nextElementSibling,cv=h.querySelector('.chv'),o=cb.classList.contains('open');
+  cb.classList.toggle('open',!o);cv.classList.toggle('o',!o);
+  h.closest('.card').classList.toggle('open',!o);
+}
+function showTab(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nt').forEach(t=>t.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  document.getElementById('main').scrollTop=0;
+  if(id==='quiz')startQuiz();
+}
+function toggleTheme(){
+  const l=!document.documentElement.hasAttribute('data-theme');
+  document.documentElement.setAttribute('data-theme',l?'light':'');
+  event.currentTarget.textContent=l?'🌙':'☀️';
+}
+function setMode(m,btn){
+  mode=m;document.querySelectorAll('.qmb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');startQuiz();
+}
+function startQuiz(){
+  let pool=mode==='all'?Q:Q.filter(q=>q.m===mode);
+  qs=[...pool].sort(()=>Math.random()-.5);
+  qi=0;answered=false;wrongs=[];
+  ts={allg:{c:0,t:0},vtrieb:{c:0,t:0},prod:{c:0,t:0},risiko:{c:0,t:0},digital:{c:0,t:0}};
+  renderQ();
+}
+function renderQ(){
+  const c=document.getElementById('qcont');
+  if(qi>=qs.length){showResult();return;}
+  const q=qs[qi];answered=false;
+  const lb={allg:'📊 Allgemein',vtrieb:'📈 Vertrieb',prod:'🏭 Produktion',risiko:'⚠️ Risiko',digital:'🤖 Digital'};
+  c.innerHTML=`<div class="qcard">
+    <div class="qprog">${qs.map((_,i)=>`<div class="qdot ${i<qi?'done':i===qi?'cur':''}"></div>`).join('')}</div>
+    <div class="qmod">Frage ${qi+1}/${qs.length} · ${lb[q.m]}</div>
+    <div class="qq">${q.q}</div>
+    <div class="qopts">${q.o.map((o,i)=>`<button class="qob" id="o${i}" onclick="answer(${i})">${o}</button>`).join('')}</div>
+    <div class="qfb" id="qfb"></div>
+    <button class="qnext" id="qnext" onclick="nextQ()">Weiter →</button>
+  </div>`;
+}
+function answer(idx){
+  if(answered)return;answered=true;
+  const q=qs[qi];if(ts[q.m])ts[q.m].t++;
+  document.querySelectorAll('.qob').forEach(o=>o.style.pointerEvents='none');
+  const fb=document.getElementById('qfb'),nb=document.getElementById('qnext');
+  if(idx===q.c){if(ts[q.m])ts[q.m].c++;document.getElementById('o'+idx).classList.add('correct');fb.className='qfb show ok';fb.innerHTML='✅ Richtig! '+q.f;}
+  else{wrongs.push(q);document.getElementById('o'+idx).classList.add('wrong');document.getElementById('o'+q.c).classList.add('show-c');fb.className='qfb show nok';fb.innerHTML='❌ Falsch. '+q.f;}
+  nb.className='qnext show';
+}
+function nextQ(){qi++;renderQ();}
+function showResult(){
+  if(wrongs.length>0&&qi===qs.length){const ex=wrongs.splice(0);qs=[...qs,...ex.sort(()=>Math.random()-.5)];renderQ();return;}
+  const tot=Object.values(ts).reduce((a,b)=>({c:a.c+b.c,t:a.t+b.t}),{c:0,t:0});
+  const pct=tot.t>0?Math.round(tot.c/tot.t*100):0;
+  const msg=pct>=90?'🎉 Klausurbereit!':pct>=80?'👍 Sehr gut!':pct>=60?'📈 Auf gutem Weg.':'📚 Weiter üben!';
+  const lb={allg:'📊 Allgemein',vtrieb:'📈 Vertrieb',prod:'🏭 Produktion',risiko:'⚠️ Risiko',digital:'🤖 Digital'};
+  const sh=Object.entries(ts).filter(([,s])=>s.t>0).map(([k,s])=>{const p=Math.round(s.c/s.t*100);return`<div class="srow"><span class="sn">${lb[k]}</span><div class="sbw"><div class="sbar" style="width:${p}%"></div></div><span class="sp">${p}%</span></div>`;}).join('');
+  document.getElementById('qcont').innerHTML=`<div class="qcard qres"><div class="big">${pct}%</div><div class="sub">${tot.c} von ${tot.t} richtig</div><div class="msg">${msg}</div>${sh?`<div style="margin-top:16px;text-align:left">${sh}</div>`:''}<button class="restart" onclick="startQuiz()">Nochmal starten</button></div>`;
+}
+startQuiz();
+</script>
+</body>
+</html>
